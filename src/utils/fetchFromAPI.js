@@ -2,19 +2,18 @@ import axios from 'axios';
 
 export const BASE_URL = 'https://youtube.googleapis.com/youtube/v3';
 
-// Ye wahi purani settings hain, bas maine ise variable me daal diya
-const baseParams = {
-  maxResults: '50',
-  key: process.env.REACT_APP_GOOGLE_API_KEY
+const options = {
+  params: {
+    maxResults: '50',
+    key: process.env.REACT_APP_GOOGLE_API_KEY
+  }
 };
 
-// Yahan badlav kiya hai: Ab ye 'customParams' bhi accept karega
+// Yahan badlav kiya hai: Ab ye 'customParams' bhi lega
 export const fetchFromAPI = async (url, customParams = {}) => {
   const { data } = await axios.get(`${BASE_URL}/${url}`, {
-    params: {
-      ...baseParams,  // Aapka API Key aur MaxResults yahan se aayega
-      ...customParams // Yahan se 'pageToken' aayega (Infinite Scroll ke liye)
-    }
+    // Purane params + Naye params (jaise pageToken) ko mix kar diya
+    params: { ...options.params, ...customParams }
   });
   return data;
 };
