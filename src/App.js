@@ -1,10 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Box } from '@mui/material';
 
-// Purane components wahi hain
-import { ChannelDetail, VideoDetail, SearchFeed, Navbar, Feed } from './components';
+// Dhyan do: Yahan maine 'PlaylistDetail' add kiya hai list mein
+import { ChannelDetail, VideoDetail, SearchFeed, Navbar, Feed, PlaylistDetail } from './components';
 
-// Naya Landing Page import kiya (Dhyaan dena yahan)
 import LandingPage from './components/LandingPage'; 
 
 const App = () => (
@@ -18,9 +17,16 @@ const App = () => (
         {/* 2. Button dabane par wo yahan aayega (Video Feed) */}
         <Route path='/feed' element={<Feed />} />
 
-        {/* Baaki sab same hai */}
+        {/* 3. Single Video */}
         <Route path='/video/:id' element={<VideoDetail />} />
+
+        {/* 4. Channel Detail */}
         <Route path='/channel/:id' element={<ChannelDetail />} />
+
+        {/* --- 5. NAYA: Playlist Detail (Ye add kiya hai) --- */}
+        <Route path='/playlist/:id' element={<PlaylistDetail />} />
+
+        {/* 6. Search Result */}
         <Route path='/search/:searchTerm' element={<SearchFeed />} />
       </Routes>
     </Box>
