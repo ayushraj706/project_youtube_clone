@@ -6,12 +6,11 @@ import { Videos, Sidebar } from "./";
 
 const Feed = () => {
   const [selectedCategory, setSelectedCategory] = useState("New");
-  // Change 1: Videos ko empty array [] se shuru kiya taaki naye videos jud sakein
+  // Change 1: 'null' nahi, empty array [] rakha hai taaki videos jud sakein
   const [videos, setVideos] = useState([]); 
-  // Change 2: Token store karne ke liye state banayi
-  const [nextPageToken, setNextPageToken] = useState("");
+  const [nextPageToken, setNextPageToken] = useState(""); // Token ke liye jagah banayi
 
-  // 1. Jab Category badle, toh pehle videos load karo
+  // 1. Jab Category badle, toh pehle 50 videos load karo
   useEffect(() => {
     setVideos([]);
     setNextPageToken("");
@@ -20,13 +19,13 @@ const Feed = () => {
       .then((data) => {
         if (data?.items) {
           setVideos(data.items);
-          setNextPageToken(data.nextPageToken); // Token save kiya agle videos ke liye
+          setNextPageToken(data.nextPageToken); // Token save kiya
         }
       })
       .catch((error) => console.log("Error loading feed:", error));
   }, [selectedCategory]);
 
-  // 2. Aur videos mangwane ka function
+  // 2. Scroll karne par aur videos mangwane ka function
   const fetchMoreVideos = () => {
     // Agar agla page nahi hai toh ruk jao
     if (!nextPageToken) return;
@@ -36,7 +35,7 @@ const Feed = () => {
         if (data?.items) {
           // Purane videos mein naye videos jod do (...spread operator)
           setVideos((prevVideos) => [...prevVideos, ...data.items]);
-          setNextPageToken(data.nextPageToken);
+          setNextPageToken(data.nextPageToken); // Naya token set karo
         }
       })
       .catch((error) => console.log("Error loading more videos:", error));
@@ -45,7 +44,7 @@ const Feed = () => {
   // 3. Scroll detect karne ka logic
   const handleScroll = (e) => {
     const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
-    // Agar user niche se 50px dur hai, toh naye video load karo
+    // Agar user niche pahunchne wala hai (50px dur), toh load karo
     if (scrollHeight - scrollTop <= clientHeight + 50) {
       fetchMoreVideos();
     }
@@ -61,13 +60,12 @@ const Feed = () => {
         </Typography>
       </Box>
 
-      {/* Change 3: Yahan 'onScroll' lagaya hai */}
+      {/* Change 2: Yahan 'onScroll' lagaya hai */}
       <Box p={2} onScroll={handleScroll} sx={{ overflowY: "auto", height: "90vh", flex: 2 }}>
         <Typography variant="h4" fontWeight="bold" mb={2} sx={{ color: "white" }}>
           {selectedCategory} <span style={{ color: "#FC1503" }}>videos</span>
         </Typography>
 
-        {/* Videos component ko videos array pass kiya */}
         <Videos videos={videos} />
       </Box>
     </Stack>
