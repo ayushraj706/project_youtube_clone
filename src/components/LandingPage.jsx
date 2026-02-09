@@ -5,6 +5,56 @@ import SchoolIcon from '@mui/icons-material/School';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+// 1. File ke sabse upar ye line likho:
+import { educationalVideos } from '../utils/videoData';
+import { Card, CardContent, CardMedia } from '@mui/material';
+
+// ... (Baaki code waisa hi rahega) ...
+
+// 2. "Features Grid" ke baad aur "Footer" se pehle ye code paste karo:
+
+        {/* ---------------- VIDEO RECOMMENDATION SECTION ---------------- */}
+        <Box sx={{ mb: 8 }}>
+          <Typography variant="h3" fontWeight="bold" gutterBottom sx={{ borderLeft: '5px solid #FC1503', pl: 2, mb: 4 }}>
+            Recommended Lectures (Must Watch)
+          </Typography>
+          
+          <Grid container spacing={3}>
+            {educationalVideos.map((video, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <Paper sx={{ backgroundColor: '#1e1e1e', color: '#fff', borderRadius: '10px', overflow: 'hidden' }}>
+                  {/* YouTube Thumbnail / Video */}
+                  <CardMedia
+                    component="iframe"
+                    height="200"
+                    src={`https://www.youtube.com/embed/${video.id}`}
+                    title={video.title}
+                    sx={{ border: 'none' }}
+                  />
+                  
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, minHeight: '60px' }}>
+                      {video.title}
+                    </Typography>
+                    <Typography variant="body2" color="gray" sx={{ fontSize: '0.9rem' }}>
+                      {video.desc}
+                    </Typography>
+                  </CardContent>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+          
+          <Box sx={{ textAlign: 'center', mt: 4 }}>
+            <Link to="/feed" style={{ textDecoration: 'none' }}>
+              <Button variant="outlined" sx={{ color: '#FC1503', borderColor: '#FC1503' }}>
+                View All Videos
+              </Button>
+            </Link>
+          </Box>
+        </Box>
+
+// ... (Footer Code yahan aayega) ...
 
 const LandingPage = () => {
   return (
