@@ -6,13 +6,17 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { demoThumbnailUrl, demoVideoUrl, demoVideoTitle, demoChannelUrl, demoChannelTitle } from "../utils/constants";
 
 const VideoCard = ({ video: { id, snippet } }) => {
-  // Logic: ID object se nikalo ya string se
-  const videoId = id?.videoId || id;
+  // Logic: Check karo ye Video hai ya Playlist
+  const videoId = id?.videoId;
+  const playlistId = id?.playlistId; // Playlist ID pakdo
+
+  // Link kahan jayega? (Video hai to /video/, Playlist hai to /playlist/)
+  const linkUrl = videoId ? `/video/${videoId}` : playlistId ? `/playlist/${playlistId}` : demoVideoUrl;
 
   return (
     <Card sx={{ width: { xs: '100%', sm: '358px', md: "320px", }, boxShadow: "none", borderRadius: 0 }}>
-      {/* 1. Thumbnail par click -> Apna Link */}
-      <Link to={videoId ? `/video/${videoId}` : demoVideoUrl }>
+      {/* Thumbnail Click */}
+      <Link to={linkUrl}>
         <CardMedia 
           image={snippet?.thumbnails?.high?.url || demoThumbnailUrl} 
           alt={snippet?.title} 
@@ -21,8 +25,8 @@ const VideoCard = ({ video: { id, snippet } }) => {
       </Link>
       
       <CardContent sx={{ backgroundColor: "#1E1E1E", height: '106px' }}>
-        {/* 2. Title par click -> Apna Link */}
-        <Link to={videoId ? `/video/${videoId}` : demoVideoUrl } >
+        {/* Title Click */}
+        <Link to={linkUrl} >
           <Typography variant="subtitle1" fontWeight="bold" color="#FFF">
             {snippet?.title.slice(0, 60) || demoVideoTitle.slice(0, 60)}
           </Typography>
