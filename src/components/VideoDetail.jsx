@@ -58,19 +58,23 @@ const VideoDetail = () => {
   return (
     <Box minHeight="95vh">
       <Stack direction={{ xs: "column", md: "row" }}>
+        
+        {/* Video Player ka section */}
         <Box flex={1}>
           <Box sx={{ width: "100%", position: "sticky", top: "86px" }}>
             
-            {/* YAHAN FIX KIYA HAI: Video Player ko bada aur responsive banaya */}
-            <ReactPlayer 
-              url={`https://www.youtube.com/watch?v=${id}`} 
-              className="react-player" 
-              controls 
-              playing={true} 
-              width="100%"       // Pura width cover karega
-              height="77vh"      // Mobile aur PC me perfect height lega
-              onEnded={handleNextVideo} 
-            />
+            {/* YAHAN FIX KIYA HAI: Ek fixed height wala box daala taaki video kabhi dabey nahi */}
+            <Box sx={{ width: "100%", height: { xs: "35vh", md: "70vh" } }}>
+              <ReactPlayer 
+                url={`https://www.youtube.com/watch?v=${id}`} 
+                className="react-player" 
+                controls 
+                playing={true} 
+                width="100%"       
+                height="100%"      
+                onEnded={handleNextVideo} 
+              />
+            </Box>
 
             <Typography color="#fff" variant="h5" fontWeight="bold" p={2}>
               {title}
@@ -93,9 +97,12 @@ const VideoDetail = () => {
             </Stack>
           </Box>
         </Box>
+
+        {/* Related Videos ka section */}
         <Box px={2} py={{ md: 1, xs: 5 }} justifyContent="center" alignItems="center" >
           <Videos videos={videos} direction="column" />
         </Box>
+
       </Stack>
     </Box>
   );
