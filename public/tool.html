@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayush's Favicon Tool</title>
+    <style>
+        body { font-family: sans-serif; background: #000; color: #fff; text-align: center; padding: 50px; }
+        .card { background: #111; padding: 30px; border-radius: 15px; border: 2px solid #2ea44f; display: inline-block; }
+        input, select, button { margin: 10px; padding: 10px; border-radius: 5px; border: none; }
+        button { background: #2ea44f; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #22863a; }
+        #preview { max-width: 150px; margin-top: 20px; display: none; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Ayush Video App Icon Tool</h2>
+        <p>Photo select karo, ye khud naam badal dega!</p>
+        
+        <input type="file" id="upload" accept="image/*"><br>
+        
+        <label>File ka naam: </label>
+        <select id="fileName">
+            <option value="favicon">favicon</option>
+            <option value="logo192">logo192</option>
+            <option value="logo512">logo512</option>
+        </select>
+        
+        <select id="fileExt">
+            <option value="png">.png (High Quality)</option>
+            <option value="ico">.ico (Standard)</option>
+        </select><br>
+
+        <button onclick="downloadImage()">Download Sahi Naam Se</button><br>
+        <img id="preview" alt="Preview">
+    </div>
+
+    <script>
+        const upload = document.getElementById('upload');
+        const preview = document.getElementById('preview');
+
+        upload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'inline-block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function downloadImage() {
+            const file = upload.files[0];
+            if (!file) {
+                alert("Pahle photo toh select kar lo bhai!");
+                return;
+            }
+
+            const name = document.getElementById('fileName').value;
+            const ext = document.getElementById('fileExt').value;
+            const link = document.createElement('a');
+            
+            link.href = preview.src;
+            link.download = `${name}.${ext}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
+
