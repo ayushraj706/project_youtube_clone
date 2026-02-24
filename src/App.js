@@ -1,22 +1,31 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Box } from '@mui/material';
-import { ChannelDetail, VideoDetail, SearchFeed, Navbar, Feed, PlaylistDetail, Shorts, BottomNav } from './components';
+
+// Aapke purane saare components
+import { ChannelDetail, VideoDetail, SearchFeed, Navbar, Feed, Shorts, BottomNav } from './components';
 import LandingPage from './components/LandingPage'; 
-import LoginPage from './components/LoginPage'; // Naya LoginPage import kiya
+import LoginPage from './components/LoginPage';
 
 const AppContent = () => {
   const location = useLocation();
   
-  // LOGIC: Agar path '/' (Landing Page) hai, toh Navbar mat dikhao
-  const showNavbar = location.pathname !== '/';
+  // LOGIC: In do pages par Navbar (Search Bar) aur BottomNav nahi dikhega
+  const isAuthPage = location.pathname === '/' || location.pathname === '/login';
 
   return (
     <Box sx={{ backgroundColor: '#000', minHeight: '100vh' }}>
-      {showNavbar && <Navbar />}
+      
+      {/* Agar page Home ya Login nahi hai, tabhi Navbar dikhao */}
+      {!isAuthPage && <Navbar />}
       
       <Routes>
+        {/* Purana logic: Landing page ab '/' par hai */}
         <Route exact path='/' element={<LandingPage />} />
+        
+        {/* Naya Login page */}
         <Route path='/login' element={<LoginPage />} />
+        
+        {/* Aapke purane saare routes waise ke waise hi hain */}
         <Route path='/feed' element={<Feed />} />
         <Route path='/shorts' element={<Shorts />} />
         <Route path='/video/:id' element={<VideoDetail />} />
@@ -24,12 +33,13 @@ const AppContent = () => {
         <Route path='/search/:searchTerm' element={<SearchFeed />} />
       </Routes>
 
-      {/* BottomNav ko bhi sirf feed/shorts mein dikhana behtar hoga */}
-      {showNavbar && location.pathname !== '/login' && <BottomNav />}
+      {/* Bottom Navigation bhi sirf main content mein dikhegi */}
+      {!isAuthPage && <BottomNav />}
     </Box>
   );
 };
 
+// Main App component jo Router provide karta hai
 const App = () => (
   <BrowserRouter>
     <AppContent />
