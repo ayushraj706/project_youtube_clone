@@ -17,7 +17,8 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-loading-skeleton": "^3.4.0",
     "zustand": "^4.5.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "swiper": "^11.0.5"
   },
   "scripts": {
     "start": "react-scripts start",
