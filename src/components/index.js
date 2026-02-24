@@ -10,4 +10,6 @@ export { default as SearchFeed } from './SearchFeed';
 export { default as Videos } from './Videos';
 export { default as Sidebar } from './Sidebar';
 export { default as PlaylistDetail } from './PlaylistDetail';
+export { default as Shorts } from './Shorts';
+export { default as BottomNav } from './BottomNav';
 
