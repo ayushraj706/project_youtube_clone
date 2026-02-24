@@ -36,7 +36,8 @@ const LandingPage = () => {
           Crack your Bihar Board (BSEB) & CBSE Matric Exams 2026 with our premium video lectures, PDF notes, and model papers. 100% Free. No Hidden Costs.
         </Typography>
 
-        <Link to="/feed" style={{ textDecoration: 'none' }}>
+        {/* LOGIC CHANGE: Yahan /feed ko badal kar /login kar diya hai */}
+        <Link to="/login" style={{ textDecoration: 'none' }}>
           <Button 
             variant="contained" 
             size="large"
@@ -74,12 +75,9 @@ const LandingPage = () => {
           </Typography>
           
           <Grid container spacing={3}>
-            {/* Ye Loop hai jo videoData.js se videos utha raha hai */}
             {educationalVideos.map((video, index) => (
               <Grid item xs={12} md={4} key={index}>
                 <Paper sx={{ backgroundColor: '#1e1e1e', color: '#fff', borderRadius: '10px', overflow: 'hidden', height: '100%' }}>
-                  
-                  {/* YouTube Video Player */}
                   <CardMedia
                     component="iframe"
                     height="200"
@@ -87,8 +85,6 @@ const LandingPage = () => {
                     title={video.title}
                     sx={{ border: 'none' }}
                   />
-                  
-                  {/* Video ka Title aur Description */}
                   <CardContent>
                     <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, fontSize: '1rem', color: '#FC1503' }}>
                       {video.title}
