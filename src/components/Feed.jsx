@@ -4,7 +4,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 
 import { fetchFromAPI } from "../utils/fetchFromAPI";
 import { Videos, Sidebar } from "./";
-import { useStore } from "../store/useStore"; // Smart Tracker
+import { useStore } from "../store/useStore"; 
 
 const Feed = () => {
   const [selectedCategory, setSelectedCategory] = useState("New");
@@ -13,7 +13,6 @@ const Feed = () => {
 
   const { watchedCategories } = useStore(); 
 
-  // 1. Initial Load: Jab pehli baar site khule
   useEffect(() => {
     setVideos([]);
     setNextPageToken("");
@@ -35,7 +34,6 @@ const Feed = () => {
       });
   }, [selectedCategory, watchedCategories]);
 
-  // 2. Infinite Scroll Load: Jab user niche scroll kare
   const fetchMoreVideos = () => {
     if (!nextPageToken) return;
 
@@ -58,10 +56,16 @@ const Feed = () => {
       });
   };
 
-  // 3. UI Render Wala Hissa
   return (
     <Stack sx={{ flexDirection: { xs: "column", md: "row" } }}>
-      <Box sx={{ height: { xs: "auto", md: "92vh" }, borderRight: "1px solid #3d3d3d", px: { xs: 0, md: 2 } }}>
+      {/* Sidebar - Desktop me ye apni jagah fasa rahega (sticky) */}
+      <Box sx={{ 
+        height: { xs: "auto", md: "92vh" }, 
+        borderRight: "1px solid #3d3d3d", 
+        px: { xs: 0, md: 2 },
+        position: { md: "sticky" }, 
+        top: 0 
+      }}>
         <Sidebar selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
         
         <Typography className="copyright" variant="body2" sx={{ mt: 1.5, color: '#fff' }}>
@@ -69,16 +73,11 @@ const Feed = () => {
         </Typography>
       </Box>
 
-      {/* Yahan height strictly 90vh rakhi hai taaki mobile aur desktop dono me scroll theek se detect ho */}
-      <Box 
-        p={2} 
-        sx={{ 
-          overflowY: "auto", 
-          height: "90vh", 
-          flex: 2 
-        }} 
-        id="scrollableDiv"
-      >
+      {/* SABSE BADA BADLAV: 
+        Yahan se 'height', 'overflowY' aur 'id' sab hata diya. 
+        Ab div automatically lamba hoga aur phone ki natural scrolling use hogi.
+      */}
+      <Box p={2} sx={{ flex: 2 }}>
         <Typography variant="h4" fontWeight="bold" mb={2} sx={{ color: "white" }}>
           {selectedCategory === "New" && watchedCategories.length > 0 ? "Recommended" : selectedCategory} <span style={{ color: "#FC1503" }}>videos</span>
         </Typography>
@@ -88,7 +87,7 @@ const Feed = () => {
           next={fetchMoreVideos}
           hasMore={!!nextPageToken} 
           loader={<Typography color="white" mt={2} textAlign="center">Loading more videos...</Typography>}
-          scrollableTarget="scrollableDiv"
+          // YAHAN SE 'scrollableTarget' HATA DIYA. Ab ye phone ke main scroll ko track karega!
         >
           <Videos videos={videos} />
         </InfiniteScroll>
@@ -98,4 +97,3 @@ const Feed = () => {
 };
 
 export default Feed;
-
