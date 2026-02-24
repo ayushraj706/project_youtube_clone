@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom"; // useNavigate add kiya
+import { Link, useParams, useNavigate } from "react-router-dom"; 
 import ReactPlayer from "react-player";
 import { Typography, Box, Stack } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { Videos, Loader } from "./";
 import { fetchFromAPI } from "../utils/fetchFromAPI";
-import { useStore } from "../store/useStore"; // Smart Tracker add kiya
+import { useStore } from "../store/useStore"; 
 
 const VideoDetail = () => {
   const [videoDetail, setVideoDetail] = useState(null);
@@ -14,16 +14,14 @@ const VideoDetail = () => {
   
   const { id } = useParams();
   const navigate = useNavigate(); 
-  const { addWatchedCategory } = useStore(); // Category save karne ke liye
+  const { addWatchedCategory } = useStore(); 
 
   useEffect(() => {
     fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
       .then((data) => {
         setVideoDetail(data.items[0]);
-        
-        // JAISE HI VIDEO LOAD HO, USKI CATEGORY SAVE KAR LO
         if(data.items[0]?.snippet?.channelTitle) {
-          addWatchedCategory(data.items[0].snippet.channelTitle); // Channel ka naam save kar liya
+          addWatchedCategory(data.items[0].snippet.channelTitle); 
         }
       });
 
@@ -31,17 +29,15 @@ const VideoDetail = () => {
       .then((data) => setVideos(data.items));
   }, [id]);
 
-  // AUTO-NEXT LOGIC: Video khatam hone par agla video chalao
   const handleNextVideo = () => {
     if (videos && videos.length > 0) {
-      const nextVideoId = videos[0].id.videoId; // Related list ka pehla video uthao
+      const nextVideoId = videos[0].id.videoId; 
       if (nextVideoId) {
         navigate(`/video/${nextVideoId}`);
       }
     }
   };
 
-  // LOCK SCREEN CONTROLS (Background me play aur next/previous)
   useEffect(() => {
     if ('mediaSession' in navigator && videoDetail) {
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -51,8 +47,6 @@ const VideoDetail = () => {
           { src: videoDetail.snippet.thumbnails.high.url, sizes: '512x512', type: 'image/png' }
         ]
       });
-
-      // Lock screen par "Next" dabane se agla video chalega
       navigator.mediaSession.setActionHandler('nexttrack', handleNextVideo);
     }
   }, [videoDetail, videos]);
@@ -66,13 +60,18 @@ const VideoDetail = () => {
       <Stack direction={{ xs: "column", md: "row" }}>
         <Box flex={1}>
           <Box sx={{ width: "100%", position: "sticky", top: "86px" }}>
+            
+            {/* YAHAN FIX KIYA HAI: Video Player ko bada aur responsive banaya */}
             <ReactPlayer 
               url={`https://www.youtube.com/watch?v=${id}`} 
               className="react-player" 
               controls 
-              playing={true} // Auto-play chalu kar diya
-              onEnded={handleNextVideo} // JAISE HI VIDEO KHATAM HOGA, NEXT FUNCTION CHALEGA
+              playing={true} 
+              width="100%"       // Pura width cover karega
+              height="77vh"      // Mobile aur PC me perfect height lega
+              onEnded={handleNextVideo} 
             />
+
             <Typography color="#fff" variant="h5" fontWeight="bold" p={2}>
               {title}
             </Typography>
