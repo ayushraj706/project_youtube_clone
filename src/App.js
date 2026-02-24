@@ -1,7 +1,5 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Box } from '@mui/material';
-
-// Aapke purane saare components
 import { ChannelDetail, VideoDetail, SearchFeed, Navbar, Feed, Shorts, BottomNav } from './components';
 import LandingPage from './components/LandingPage'; 
 import LoginPage from './components/LoginPage';
@@ -9,23 +7,24 @@ import LoginPage from './components/LoginPage';
 const AppContent = () => {
   const location = useLocation();
   
-  // LOGIC: In do pages par Navbar (Search Bar) aur BottomNav nahi dikhega
+  // LOGIC 1: Check karo user pehle se login hai ya nahi (localStorage se)
+  const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+
+  // LOGIC 2: Navbar aur BottomNav ko Landing/Login page par hide karna
   const isAuthPage = location.pathname === '/' || location.pathname === '/login';
 
   return (
     <Box sx={{ backgroundColor: '#000', minHeight: '100vh' }}>
       
-      {/* Agar page Home ya Login nahi hai, tabhi Navbar dikhao */}
+      {/* Search bar sirf tab dikhega jab user login ho kar feed/video dekh raha ho */}
       {!isAuthPage && <Navbar />}
       
       <Routes>
-        {/* Purana logic: Landing page ab '/' par hai */}
-        <Route exact path='/' element={<LandingPage />} />
+        {/* LOGIC 3: Agar logged in hai, toh Landing/Login page nahi dikhega, seedha Feed aayega */}
+        <Route exact path='/' element={isLoggedIn ? <Navigate to="/feed" /> : <LandingPage />} />
+        <Route path='/login' element={isLoggedIn ? <Navigate to="/feed" /> : <LoginPage />} />
         
-        {/* Naya Login page */}
-        <Route path='/login' element={<LoginPage />} />
-        
-        {/* Aapke purane saare routes waise ke waise hi hain */}
+        {/* Aapke purane saare routes safe hain */}
         <Route path='/feed' element={<Feed />} />
         <Route path='/shorts' element={<Shorts />} />
         <Route path='/video/:id' element={<VideoDetail />} />
@@ -33,13 +32,11 @@ const AppContent = () => {
         <Route path='/search/:searchTerm' element={<SearchFeed />} />
       </Routes>
 
-      {/* Bottom Navigation bhi sirf main content mein dikhegi */}
       {!isAuthPage && <BottomNav />}
     </Box>
   );
 };
 
-// Main App component jo Router provide karta hai
 const App = () => (
   <BrowserRouter>
     <AppContent />
