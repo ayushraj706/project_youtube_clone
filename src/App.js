@@ -9,21 +9,19 @@ const App = () => (
     <Box sx={{ backgroundColor: '#000', minHeight: '100vh' }}>
       <Navbar />
       
-      {/* SAARA KHEL YAHAN HAI: Routes ke andar hi sab kuch hona chahiye */}
       <Routes>
-        {/* Sirf jab link ayus.fun/ hoga, tabhi Landing Page dikhega */}
+        {/* Yahan 'exact' lagana zaroori hai, taaki ye sirf home page par dikhe */}
         <Route exact path='/' element={<LandingPage />} />
-
-        {/* Baaki sab apne-apne link par dikhenge */}
+        
         <Route path='/feed' element={<Feed />} />
         <Route path='/video/:id' element={<VideoDetail />} />
         <Route path='/channel/:id' element={<ChannelDetail />} />
         <Route path='/playlist/:id' element={<PlaylistDetail />} />
         <Route path='/search/:searchTerm' element={<SearchFeed />} />
       </Routes>
-      
     </Box>
   </BrowserRouter>
 );
 
 export default App;
+  
