@@ -17,16 +17,25 @@ const VideoDetail = () => {
   const { addWatchedCategory } = useStore(); 
 
   useEffect(() => {
+    // 1. Pehle Video ki detail mangwao
     fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
       .then((data) => {
         setVideoDetail(data.items[0]);
-        if(data.items[0]?.snippet?.channelTitle) {
-          addWatchedCategory(data.items[0].snippet.channelTitle); 
+        
+        const channelId = data.items[0]?.snippet?.channelId;
+        const channelTitle = data.items[0]?.snippet?.channelTitle;
+        
+        if(channelTitle) {
+          addWatchedCategory(channelTitle); 
+        }
+
+        // 2. BADA BADLAV: YouTube ne 'relatedToVideoId' block kar diya hai.
+        // Ab hum uske bajaye ussi channel ke latest videos fetch kar rahe hain.
+        if(channelId) {
+          fetchFromAPI(`search?part=snippet&channelId=${channelId}&type=video&maxResults=15`)
+            .then((relatedData) => setVideos(relatedData.items));
         }
       });
-
-    fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`)
-      .then((data) => setVideos(data.items));
   }, [id]);
 
   const handleNextVideo = () => {
@@ -53,18 +62,17 @@ const VideoDetail = () => {
 
   if(!videoDetail?.snippet) return <Loader />;
 
-  const { snippet: { title, channelId, channelTitle }, statistics: { viewCount, likeCount } } = videoDetail;
+  const { snippet: { title, channelId: chId, channelTitle: chTitle }, statistics: { viewCount, likeCount } } = videoDetail;
 
   return (
     <Box minHeight="95vh">
       <Stack direction={{ xs: "column", md: "row" }}>
         
-        {/* Video Player ka section */}
+        {/* VIDEO PLAYER SECTION */}
         <Box flex={1}>
           <Box sx={{ width: "100%", position: "sticky", top: "86px" }}>
             
-            {/* YAHAN FIX KIYA HAI: Ek fixed height wala box daala taaki video kabhi dabey nahi */}
-            <Box sx={{ width: "100%", height: { xs: "35vh", md: "70vh" } }}>
+            <Box sx={{ width: "100%", height: { xs: "30vh", sm: "45vh", md: "70vh" } }}>
               <ReactPlayer 
                 url={`https://www.youtube.com/watch?v=${id}`} 
                 className="react-player" 
@@ -80,9 +88,9 @@ const VideoDetail = () => {
               {title}
             </Typography>
             <Stack direction="row" justifyContent="space-between" sx={{ color: "#fff" }} py={1} px={2} >
-              <Link to={`/channel/${channelId}`}>
+              <Link to={`/channel/${chId}`}>
                 <Typography variant={{ sm: "subtitle1", md: 'h6' }}  color="#fff" >
-                  {channelTitle}
+                  {chTitle}
                   <CheckCircleIcon sx={{ fontSize: "12px", color: "gray", ml: "5px" }} />
                 </Typography>
               </Link>
@@ -98,9 +106,10 @@ const VideoDetail = () => {
           </Box>
         </Box>
 
-        {/* Related Videos ka section */}
+        {/* RELATED VIDEOS SECTION (Yahan ab channel ke videos aayenge) */}
         <Box px={2} py={{ md: 1, xs: 5 }} justifyContent="center" alignItems="center" >
-          <Videos videos={videos} direction="column" />
+          {/* Agar videos abhi load nahi hue hain, toh Loader dikhega (Landing Page nahi!) */}
+          {!videos ? <Loader /> : <Videos videos={videos} direction="column" />}
         </Box>
 
       </Stack>
@@ -109,3 +118,4 @@ const VideoDetail = () => {
 };
 
 export default VideoDetail;
+
