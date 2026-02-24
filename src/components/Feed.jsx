@@ -31,7 +31,7 @@ const Feed = () => {
       })
       .catch((error) => {
         console.log("Error loading feed:", error);
-        setNextPageToken(""); // Error aaye toh loading rok do
+        setNextPageToken(""); 
       });
   }, [selectedCategory, watchedCategories]);
 
@@ -45,20 +45,21 @@ const Feed = () => {
 
     fetchFromAPI(`search?part=snippet&q=${query}&pageToken=${nextPageToken}`)
       .then((data) => {
-        if (data?.items) {
+        // STRICT CHECK: Agar naya data aaye tabhi array me jodo
+        if (data?.items && data.items.length > 0) {
           setVideos((prevVideos) => [...prevVideos, ...data.items]);
           setNextPageToken(data.nextPageToken || ""); 
         } else {
-          setNextPageToken(""); // API limit khatam hone par loading rok do
+          setNextPageToken(""); // Data nahi aaya toh loading band karo
         }
       })
       .catch((error) => {
         console.log("Error loading more videos:", error);
-        setNextPageToken(""); // Error aane par loading rok do
+        setNextPageToken(""); // Error aane par loading band karo
       });
   };
 
-  // 3. UI Render (Aapka return wala hissa yahan hai)
+  // 3. UI Render
   return (
     <Stack sx={{ flexDirection: { xs: "column", md: "row" } }}>
       <Box sx={{ height: { xs: "auto", md: "92vh" }, borderRight: "1px solid #3d3d3d", px: { xs: 0, md: 2 } }}>
@@ -69,8 +70,16 @@ const Feed = () => {
         </Typography>
       </Box>
 
-      {/* Yahan id="scrollableDiv" zaroori hai InfiniteScroll ke liye */}
-      <Box p={2} sx={{ overflowY: "auto", height: "calc(100vh - 90px)", flex: 2 }} id="scrollableDiv">
+      {/* MOBILE SCROLL FIX: xs ke liye height "calc(100vh - 140px)" ki gayi hai taaki screen ke andar fit rahe aur scroll pakde */}
+      <Box 
+        p={2} 
+        sx={{ 
+          overflowY: "auto", 
+          height: { xs: "calc(100vh - 140px)", md: "calc(100vh - 90px)" }, 
+          flex: 2 
+        }} 
+        id="scrollableDiv"
+      >
         <Typography variant="h4" fontWeight="bold" mb={2} sx={{ color: "white" }}>
           {selectedCategory === "New" && watchedCategories.length > 0 ? "Recommended" : selectedCategory} <span style={{ color: "#FC1503" }}>videos</span>
         </Typography>
@@ -78,7 +87,7 @@ const Feed = () => {
         <InfiniteScroll
           dataLength={videos.length}
           next={fetchMoreVideos}
-          hasMore={!!nextPageToken} // Jab tak token hai tab tak scroll karo
+          hasMore={!!nextPageToken} // Jab tak token hai tab tak load karo
           loader={<Typography color="white" mt={2} textAlign="center">Loading more videos...</Typography>}
           scrollableTarget="scrollableDiv"
         >
