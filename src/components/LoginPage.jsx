@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Stack } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const LoginPage = () => {
@@ -7,6 +8,7 @@ const LoginPage = () => {
   const [otp, setOtp] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const renderOtpMask = () => {
     const fullPlaceholder = "xxxxxx";
@@ -14,26 +16,31 @@ const LoginPage = () => {
   };
 
   const handleSendOtp = async () => {
-    if (!email) return alert("Bhai, Email toh daalo!");
+    if (!email) return alert("Email daalein!");
     setLoading(true);
-    
     try {
-      const response = await axios.post('/api/send-otp', { email });
+      await axios.post('/api/send-otp', { email });
+      setIsOtpSent(true);
+    } catch (err) {
+      alert("OTP nahi gaya! Check connection.");
+    } finally { setLoading(false); }
+  };
+
+  // NAYA LOGIC: OTP Verify karke feed par bhejna
+  const handleVerifyAndLogin = async () => {
+    if (otp.length < 6) return alert("Pura 6 digit daalo!");
+    setLoading(true);
+    try {
+      const response = await axios.post('/api/verify-otp', { email, otp });
       if (response.data.success) {
-        setIsOtpSent(true);
+        // Session save karo taaki baar-baar login na mangey
+        localStorage.setItem('userLoggedIn', 'true');
+        localStorage.setItem('userEmail', email);
+        navigate('/feed'); // Feed par bhej do
       }
     } catch (err) {
-      console.error("Full Error Object:", err);
-      
-      // LOGIC: Server se jo error message aayega use nikalna
-      const serverError = err.response?.data?.error; 
-      const networkError = err.message;
-      
-      // Detailed Alert
-      alert(`OTP Bhejne Mein Galti Hui!\n\nReason: ${serverError || networkError || "Unknown Issue"}`);
-    } finally {
-      setLoading(false);
-    }
+      alert("Galat OTP hai bhai, fir se check karo!");
+    } finally { setLoading(false); }
   };
 
   return (
@@ -44,14 +51,9 @@ const LoginPage = () => {
         {!isOtpSent ? (
           <>
             <Typography variant="h4" fontWeight="bold" color="white">Login</Typography>
-            <TextField 
-              fullWidth label="Email Address" 
-              variant="outlined" value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              sx={{ input: { color: 'white' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#333' } } }}
-            />
+            <TextField fullWidth label="Email Address" variant="outlined" value={email} onChange={(e) => setEmail(e.target.value)} sx={{ input: { color: 'white' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#333' } } }} />
             <Button fullWidth onClick={handleSendOtp} disabled={loading} variant="contained" sx={{ bgcolor: '#FF1100', py: 1.5, fontWeight: 'bold' }}>
-              {loading ? "Checking..." : "SEND OTP"}
+              {loading ? "Bhej raha hoon..." : "SEND OTP"}
             </Button>
           </>
         ) : (
@@ -61,14 +63,20 @@ const LoginPage = () => {
               <Typography variant="h3" sx={{ letterSpacing: '12px', fontFamily: 'monospace', color: '#FF1100', fontWeight: 'bold' }}>
                 {renderOtpMask()}
               </Typography>
+              {/* NUMERIC KEYBOARD FIX: inputMode="numeric" aur pattern ka use */}
               <input 
-                autoFocus type="text" maxLength="6" value={otp}
+                autoFocus 
+                type="text" 
+                inputMode="numeric" 
+                pattern="[0-9]*"
+                maxLength="6" 
+                value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'text' }}
               />
             </Box>
-            <Button fullWidth variant="contained" sx={{ bgcolor: '#2ea44f', py: 1.5, fontWeight: 'bold' }}>
-              VERIFY & LOGIN
+            <Button fullWidth onClick={handleVerifyAndLogin} disabled={loading} variant="contained" sx={{ bgcolor: '#2ea44f', py: 1.5, fontWeight: 'bold' }}>
+              {loading ? "Checking..." : "VERIFY & LOGIN"}
             </Button>
           </>
         )}
