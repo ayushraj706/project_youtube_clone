@@ -35,26 +35,16 @@ const Feed = () => {
       });
   }, [selectedCategory, watchedCategories]);
 
-  // --------------------------------------------------------
-  // 2. YAHI HAI WOH 'fetchMoreVideos' FUNCTION
-  // --------------------------------------------------------
+  // 2. Infinite Scroll Load: Jab user niche scroll kare
   const fetchMoreVideos = () => {
-    console.log("👉 SCROLL DETECT HUA! fetchMoreVideos function chal gaya."); 
-
-    if (!nextPageToken) {
-      console.log("❌ Token khali hai, yahin se wapas ja raha hu.");
-      return;
-    }
+    if (!nextPageToken) return;
 
     const query = (selectedCategory === "New" && watchedCategories.length > 0)
       ? watchedCategories[0]
       : selectedCategory;
 
-    console.log("⏳ API ko call ja rahi hai is token ke sath:", nextPageToken);
-
     fetchFromAPI(`search?part=snippet&q=${query}&pageToken=${nextPageToken}`)
       .then((data) => {
-        console.log("✅ API se naya data aa gaya!", data); 
         if (data?.items && data.items.length > 0) {
           setVideos((prevVideos) => [...prevVideos, ...data.items]);
           setNextPageToken(data.nextPageToken || ""); 
@@ -63,7 +53,7 @@ const Feed = () => {
         }
       })
       .catch((error) => {
-        console.log("🚨 Error aa gayi API me:", error);
+        console.log("Error loading more videos:", error);
         setNextPageToken("");
       });
   };
@@ -79,14 +69,13 @@ const Feed = () => {
         </Typography>
       </Box>
 
-      {/* DEBUGGING KE LIYE: Mobile view me is box par lal rang ka border aayega */}
+      {/* Yahan height strictly 90vh rakhi hai taaki mobile aur desktop dono me scroll theek se detect ho */}
       <Box 
         p={2} 
         sx={{ 
           overflowY: "auto", 
-          height: { xs: "400px", md: "calc(100vh - 90px)" }, 
-          flex: 2,
-          border: { xs: "5px solid red", md: "none" } // Naya line: Laal border sirf mobile me
+          height: "90vh", 
+          flex: 2 
         }} 
         id="scrollableDiv"
       >
@@ -96,7 +85,7 @@ const Feed = () => {
 
         <InfiniteScroll
           dataLength={videos.length}
-          next={fetchMoreVideos} // InfiniteScroll yahan se us function ko call karta hai
+          next={fetchMoreVideos}
           hasMore={!!nextPageToken} 
           loader={<Typography color="white" mt={2} textAlign="center">Loading more videos...</Typography>}
           scrollableTarget="scrollableDiv"
@@ -109,3 +98,4 @@ const Feed = () => {
 };
 
 export default Feed;
+
