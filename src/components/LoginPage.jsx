@@ -5,65 +5,78 @@ import axios from 'axios';
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
-  const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // OTP Input handle karne ka logic (xxxxxx placeholder)
-  const handleOtpChange = (e) => {
-    const val = e.target.value.replace(/\D/g, ''); // Sirf numbers allow karein
-    if (val.length <= 6) setOtp(val);
+  // Magic Logic: 'x' ko digits se replace karna
+  const renderOtpDisplay = () => {
+    const placeholder = "xxxxxx";
+    return otp + placeholder.slice(otp.length);
   };
 
-  // Display ke liye placeholder logic
-  const displayOtp = otp + "x".repeat(6 - otp.length);
-
   const handleSendOtp = async () => {
-    if(!email) return alert("Bhai, Email toh daalo!");
+    if (!email) return alert("Bhai, pehle Gmail toh daalo!");
+    setLoading(true);
     try {
-      // Vercel backend ko call karein
-      await axios.post('/api/send-otp', { email });
-      setShowOtpScreen(true);
-    } catch (err) { alert("OTP bhejne mein galti hui!"); }
+      // Backend call to Vercel API
+      const response = await axios.post('/api/send-otp', { email });
+      if (response.data.success) {
+        setIsOtpSent(true);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("OTP bhejne mein galti hui! Check karo Resend API sahi hai ya nahi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" bgcolor="#000">
-      <Stack spacing={3} alignItems="center" sx={{ width: '90%', maxWidth: '400px', p: 4, borderRadius: '15px', border: '1px solid #333' }}>
-        <img src="/favicon.ico" alt="logo" height={80} />
+      <Stack spacing={4} alignItems="center" sx={{ width: '90%', maxWidth: '400px', p: 4, borderRadius: '20px', border: '1px solid #222', background: '#0a0a0a' }}>
         
-        {!showOtpScreen ? (
+        {/* Hexagon Logo */}
+        <img src="/favicon.ico" alt="logo" height={70} />
+
+        {!isOtpSent ? (
           <>
             <Typography variant="h4" fontWeight="bold" color="white">Login</Typography>
+            <Typography variant="body2" color="gray" textAlign="center">Apna Email daalein aur 10th Board ki taiyari shuru karein!</Typography>
+            
             <TextField 
-              fullWidth label="Email Address" 
-              variant="outlined" value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              sx={{ input: { color: 'white' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#333' } } }}
+              fullWidth placeholder="example@gmail.com" 
+              value={email} onChange={(e) => setEmail(e.target.value)}
+              sx={{ input: { color: 'white' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#333' }, '&:hover fieldset': { borderColor: '#FF1100' } } }}
             />
-            <Button fullWidth onClick={handleSendOtp} variant="contained" sx={{ bgcolor: '#FF1100', fontWeight: 'bold' }}>
-              SEND OTP
+
+            <Button fullWidth onClick={handleSendOtp} disabled={loading} variant="contained" sx={{ bgcolor: '#FF1100', py: 1.5, '&:hover': { bgcolor: '#cc0e00' } }}>
+              {loading ? "Bhej raha hoon..." : "SEND OTP"}
             </Button>
           </>
         ) : (
           <>
-            <Typography variant="h4" fontWeight="bold" color="white">Verify OTP</Typography>
-            <Typography color="gray">Ek 6-digit code aapke email par bheja gaya hai.</Typography>
+            <Typography variant="h4" fontWeight="bold" color="white">Verify Code</Typography>
             
-            {/* Custom Styled OTP Input */}
-            <Box sx={{ position: 'relative', width: '100%' }}>
-              <Typography variant="h3" sx={{ textAlign: 'center', letterSpacing: '10px', color: '#FF1100', fontWeight: 'bold', fontFamily: 'monospace' }}>
-                {displayOtp}
+            {/* GitHub Style xxxxx Display */}
+            <Box sx={{ py: 4, textAlign: 'center' }}>
+              <Typography variant="h3" sx={{ letterSpacing: '8px', fontFamily: 'monospace', color: '#FF1100', fontWeight: 'bold' }}>
+                {renderOtpDisplay()}
               </Typography>
-              <input 
-                type="text" value={otp} onChange={handleOtpChange}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
-              />
+              <Typography variant="caption" color="gray">Type your 6-digit code</Typography>
             </Box>
 
-            <Button fullWidth variant="contained" sx={{ bgcolor: '#FF1100', fontWeight: 'bold' }}>
-              LOGIN NOW
+            <input 
+              autoFocus type="text" maxLength="6" value={otp} 
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+              style={{ opacity: 0, position: 'absolute', zIndex: -1 }} 
+            />
+
+            <Button fullWidth variant="contained" sx={{ bgcolor: '#2ea44f', py: 1.5, fontWeight: 'bold' }}>
+              VERIFY & LOGIN
             </Button>
-            <Typography onClick={() => setShowOtpScreen(false)} sx={{ color: 'gray', cursor: 'pointer', fontSize: '14px' }}>
-              Galti ho gayi? Email badlein
+            
+            <Typography onClick={() => setIsOtpSent(false)} sx={{ color: 'gray', cursor: 'pointer', mt: 2, fontSize: '13px' }}>
+              Email galat hai? Wapas jaiye
             </Typography>
           </>
         )}
