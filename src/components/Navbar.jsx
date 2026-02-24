@@ -9,65 +9,73 @@ const Navbar = () => {
   const navigate = useNavigate();
   const open = Boolean(anchorEl);
 
-  // Profile pic par click karne ka logic
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // 1. LocalStorage se email uthana
+  const userEmail = localStorage.getItem('userEmail') || "User";
+  const firstLetter = userEmail.charAt(0).toUpperCase(); // Pehla akshar bada karke
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleClick = (event) => { setAnchorEl(event.currentTarget); };
+  const handleClose = () => { setAnchorEl(null); };
 
-  // LOGOUT LOGIC: Sab kuch saaf karke landing page par bhej do
   const handleLogout = () => {
     localStorage.removeItem('userLoggedIn');
     localStorage.removeItem('userEmail');
     handleClose();
     navigate('/');
-    window.location.reload(); // State reset karne ke liye
+    window.location.reload(); 
   };
 
   return (
-    <Stack direction="row" alignItems="center" p={2} sx={{ position:  "sticky", background: '#000', top: 0, justifyContent: "space-between", zIndex: 10 }}>
+    <Stack direction="row" alignItems="center" p={2} sx={{ position: "sticky", background: '#000', top: 0, justifyContent: "space-between", zIndex: 10 }}>
       
       <Box display="flex" alignItems="center">
         <Link to="/" style={{ display: "flex", alignItems: "center" }}>
           <img src={logo} alt="logo" height={45} />
         </Link>
 
-        {/* NAYA FEATURE: Default Profile Pic */}
-        <IconButton onClick={handleClick} sx={{ ml: 1, p: 0 }}>
+        {/* Dynamic Avatar: Pehla Letter automatic dikhega */}
+        <IconButton onClick={handleClick} sx={{ ml: 1.5, p: 0 }}>
           <Avatar 
-            sx={{ width: 35, height: 35, bgcolor: '#333', border: '1px solid #444' }}
-            src="/default-user.png" // Agar aapke paas koi image hai toh yahan path dein
-          />
+            sx={{ 
+              width: 38, 
+              height: 38, 
+              bgcolor: '#FF5722', // Mast rangin dabba
+              fontSize: '18px',
+              fontWeight: 'bold',
+              border: '2px solid #333'
+            }}
+          >
+            {firstLetter}
+          </Avatar>
         </IconButton>
       </Box>
 
       <SearchBar />
 
-      {/* Logout Menu Popup */}
+      {/* Logout Menu */}
       <Menu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         PaperProps={{
           sx: {
-            bgcolor: '#1a1a1a',
+            bgcolor: '#111',
             color: 'white',
             mt: 1.5,
+            minWidth: '180px',
             border: '1px solid #333',
-            '& .MuiMenuItem-root:hover': { bgcolor: '#333' }
+            '& .MuiMenuItem-root:hover': { bgcolor: '#222' }
           }
         }}
       >
-        <Box sx={{ px: 2, py: 1 }}>
-          <Typography variant="caption" color="gray">Logged in as:</Typography>
-          <Typography variant="body2">{localStorage.getItem('userEmail')}</Typography>
+        <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid #222' }}>
+          <Typography variant="caption" color="gray">Account</Typography>
+          <Typography variant="body2" sx={{ fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {userEmail}
+          </Typography>
         </Box>
         
-        {/* LAL RANG KA LOGOUT BUTTON */}
-        <MenuItem onClick={handleLogout} sx={{ color: '#FC1503', fontWeight: 'bold' }}>
+        {/* LAL RANG KA LOGOUT */}
+        <MenuItem onClick={handleLogout} sx={{ color: '#FF1100', fontWeight: 'bold', py: 1.5 }}>
           LOGOUT
         </MenuItem>
       </Menu>
