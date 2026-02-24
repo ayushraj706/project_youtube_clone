@@ -1,53 +1,54 @@
 import React, { useEffect, useState } from "react";
 import { Box, Stack, Typography } from "@mui/material";
-
+import InfiniteScroll from "react-infinite-scroll-component"; // Modern Scroll
 import { fetchFromAPI } from "../utils/fetchFromAPI";
 import { Videos, Sidebar } from "./";
+import { useStore } from "../store/useStore"; // Smart Tracker
 
 const Feed = () => {
   const [selectedCategory, setSelectedCategory] = useState("New");
-  // Change 1: 'null' nahi, empty array [] rakha hai taaki videos jud sakein
-  const [videos, setVideos] = useState([]); 
-  const [nextPageToken, setNextPageToken] = useState(""); // Token ke liye jagah banayi
+  const [videos, setVideos] = useState([]);
+  const [nextPageToken, setNextPageToken] = useState("");
+  
+  // Zustand store se user ki pichli dekhi hui history nikal rahe hain
+  const { watchedCategories } = useStore(); 
 
-  // 1. Jab Category badle, toh pehle 50 videos load karo
   useEffect(() => {
     setVideos([]);
     setNextPageToken("");
 
-    fetchFromAPI(`search?part=snippet&q=${selectedCategory}`)
+    // SMART SYSTEM: Agar user pehli baar aaya hai ("New" category par) aur uski history hai, 
+    // toh default ki jagah uski pasand ki video search hogi.
+    const query = (selectedCategory === "New" && watchedCategories.length > 0)
+      ? watchedCategories[0] 
+      : selectedCategory;
+
+    fetchFromAPI(`search?part=snippet&q=${query}`)
       .then((data) => {
         if (data?.items) {
           setVideos(data.items);
-          setNextPageToken(data.nextPageToken); // Token save kiya
+          setNextPageToken(data.nextPageToken || ""); 
         }
       })
       .catch((error) => console.log("Error loading feed:", error));
-  }, [selectedCategory]);
+  }, [selectedCategory, watchedCategories]);
 
-  // 2. Scroll karne par aur videos mangwane ka function
   const fetchMoreVideos = () => {
-    // Agar agla page nahi hai toh ruk jao
     if (!nextPageToken) return;
 
-    fetchFromAPI(`search?part=snippet&q=${selectedCategory}`, { pageToken: nextPageToken })
+    const query = (selectedCategory === "New" && watchedCategories.length > 0)
+      ? watchedCategories[0]
+      : selectedCategory;
+
+    // API me pageToken bhej kar agla data mangwa rahe hain
+    fetchFromAPI(`search?part=snippet&q=${query}&pageToken=${nextPageToken}`)
       .then((data) => {
         if (data?.items) {
-          // Purane videos mein naye videos jod do (...spread operator)
-          setVideos((prevVideos) => [...prevVideos, ...data.items]);
-          setNextPageToken(data.nextPageToken); // Naya token set karo
+          setVideos((prevVideos) => [...prevVideos, ...data.items]); // Purane data me naya joda
+          setNextPageToken(data.nextPageToken || ""); 
         }
       })
       .catch((error) => console.log("Error loading more videos:", error));
-  };
-
-  // 3. Scroll detect karne ka logic
-  const handleScroll = (e) => {
-    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
-    // Agar user niche pahunchne wala hai (50px dur), toh load karo
-    if (scrollHeight - scrollTop <= clientHeight + 50) {
-      fetchMoreVideos();
-    }
   };
 
   return (
@@ -60,13 +61,22 @@ const Feed = () => {
         </Typography>
       </Box>
 
-      {/* Change 2: Yahan 'onScroll' lagaya hai */}
-      <Box p={2} onScroll={handleScroll} sx={{ overflowY: "auto", height: "90vh", flex: 2 }}>
+      {/* Yahan ID 'scrollableDiv' diya hai taaki InfiniteScroll ko pata chale kahan scroll ho raha hai */}
+      <Box p={2} sx={{ overflowY: "auto", height: "90vh", flex: 2 }} id="scrollableDiv">
         <Typography variant="h4" fontWeight="bold" mb={2} sx={{ color: "white" }}>
-          {selectedCategory} <span style={{ color: "#FC1503" }}>videos</span>
+          {selectedCategory === "New" && watchedCategories.length > 0 ? "Recommended" : selectedCategory} <span style={{ color: "#FC1503" }}>videos</span>
         </Typography>
 
-        <Videos videos={videos} />
+        {/* Modern Infinite Scroll - Ab manual math calculation ki zaroorat nahi */}
+        <InfiniteScroll
+          dataLength={videos.length}
+          next={fetchMoreVideos}
+          hasMore={!!nextPageToken} // Jab tak token hai, scroll hota rahega
+          loader={<Typography color="white" mt={2} textAlign="center">Loading more videos...</Typography>}
+          scrollableTarget="scrollableDiv"
+        >
+          <Videos videos={videos} />
+        </InfiniteScroll>
       </Box>
     </Stack>
   );
