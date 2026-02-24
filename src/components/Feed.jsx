@@ -13,7 +13,7 @@ const Feed = () => {
 
   const { watchedCategories } = useStore(); 
 
-  // 1. Initial Load: Jab category badle ya page pehli baar khule
+  // 1. Initial Load: Jab pehli baar site khule
   useEffect(() => {
     setVideos([]);
     setNextPageToken("");
@@ -35,31 +35,40 @@ const Feed = () => {
       });
   }, [selectedCategory, watchedCategories]);
 
-  // 2. Infinite Scroll Load: Jab user niche scroll kare
+  // --------------------------------------------------------
+  // 2. YAHI HAI WOH 'fetchMoreVideos' FUNCTION
+  // --------------------------------------------------------
   const fetchMoreVideos = () => {
-    if (!nextPageToken) return;
+    console.log("👉 SCROLL DETECT HUA! fetchMoreVideos function chal gaya."); 
+
+    if (!nextPageToken) {
+      console.log("❌ Token khali hai, yahin se wapas ja raha hu.");
+      return;
+    }
 
     const query = (selectedCategory === "New" && watchedCategories.length > 0)
       ? watchedCategories[0]
       : selectedCategory;
 
+    console.log("⏳ API ko call ja rahi hai is token ke sath:", nextPageToken);
+
     fetchFromAPI(`search?part=snippet&q=${query}&pageToken=${nextPageToken}`)
       .then((data) => {
-        // STRICT CHECK: Agar naya data aaye tabhi array me jodo
+        console.log("✅ API se naya data aa gaya!", data); 
         if (data?.items && data.items.length > 0) {
           setVideos((prevVideos) => [...prevVideos, ...data.items]);
           setNextPageToken(data.nextPageToken || ""); 
         } else {
-          setNextPageToken(""); // Data nahi aaya toh loading band karo
+          setNextPageToken(""); 
         }
       })
       .catch((error) => {
-        console.log("Error loading more videos:", error);
-        setNextPageToken(""); // Error aane par loading band karo
+        console.log("🚨 Error aa gayi API me:", error);
+        setNextPageToken("");
       });
   };
 
-  // 3. UI Render
+  // 3. UI Render Wala Hissa
   return (
     <Stack sx={{ flexDirection: { xs: "column", md: "row" } }}>
       <Box sx={{ height: { xs: "auto", md: "92vh" }, borderRight: "1px solid #3d3d3d", px: { xs: 0, md: 2 } }}>
@@ -70,13 +79,14 @@ const Feed = () => {
         </Typography>
       </Box>
 
-      {/* MOBILE SCROLL FIX: xs ke liye height "calc(100vh - 140px)" ki gayi hai taaki screen ke andar fit rahe aur scroll pakde */}
+      {/* DEBUGGING KE LIYE: Mobile view me is box par lal rang ka border aayega */}
       <Box 
         p={2} 
         sx={{ 
           overflowY: "auto", 
-          height: { xs: "calc(100vh - 140px)", md: "calc(100vh - 90px)" }, 
-          flex: 2 
+          height: { xs: "400px", md: "calc(100vh - 90px)" }, 
+          flex: 2,
+          border: { xs: "5px solid red", md: "none" } // Naya line: Laal border sirf mobile me
         }} 
         id="scrollableDiv"
       >
@@ -86,8 +96,8 @@ const Feed = () => {
 
         <InfiniteScroll
           dataLength={videos.length}
-          next={fetchMoreVideos}
-          hasMore={!!nextPageToken} // Jab tak token hai tab tak load karo
+          next={fetchMoreVideos} // InfiniteScroll yahan se us function ko call karta hai
+          hasMore={!!nextPageToken} 
           loader={<Typography color="white" mt={2} textAlign="center">Loading more videos...</Typography>}
           scrollableTarget="scrollableDiv"
         >
