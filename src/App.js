@@ -7,24 +7,22 @@ import LoginPage from './components/LoginPage';
 const AppContent = () => {
   const location = useLocation();
   
-  // LOGIC 1: Check karo user pehle se login hai ya nahi (localStorage se)
+  // Memory check: Kya user login hai?
   const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
 
-  // LOGIC 2: Navbar aur BottomNav ko Landing/Login page par hide karna
+  // Auth pages (Home aur Login) par search bar nahi dikhana hai
   const isAuthPage = location.pathname === '/' || location.pathname === '/login';
 
   return (
     <Box sx={{ backgroundColor: '#000', minHeight: '100vh' }}>
-      
-      {/* Search bar sirf tab dikhega jab user login ho kar feed/video dekh raha ho */}
       {!isAuthPage && <Navbar />}
       
       <Routes>
-        {/* LOGIC 3: Agar logged in hai, toh Landing/Login page nahi dikhega, seedha Feed aayega */}
+        {/* Agar login hai, toh seedha Feed par bhej do, warna Landing dikhao */}
         <Route exact path='/' element={isLoggedIn ? <Navigate to="/feed" /> : <LandingPage />} />
         <Route path='/login' element={isLoggedIn ? <Navigate to="/feed" /> : <LoginPage />} />
         
-        {/* Aapke purane saare routes safe hain */}
+        {/* Aapke purane saare zaroori routes */}
         <Route path='/feed' element={<Feed />} />
         <Route path='/shorts' element={<Shorts />} />
         <Route path='/video/:id' element={<VideoDetail />} />
@@ -44,3 +42,4 @@ const App = () => (
 );
 
 export default App;
+          
