@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Stack } from '@mui/material';
+// 🚀 Smart Imports: Isse poori library ki jagah sirf kaam ke components load honge
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -18,17 +24,17 @@ const LoginPage = () => {
   const handleSendOtp = async () => {
     if (!email) return alert("Bhai, Email toh daalo!");
     
-    // Pehla Pop-up: Ye confirm karega ki button zinda hai
+    // Pehla Pop-up
     alert("1. Button daba diya gaya hai! Ab Vercel ko request jayegi."); 
     
     setLoading(true);
     try {
       const res = await axios.post('/api/send-otp', { email });
-      // Dusra Pop-up: Agar Vercel ne OTP bhej diya
+      // Dusra Pop-up
       alert("2. Vercel tak request chali gayi. Jawab aaya: " + JSON.stringify(res.data)); 
       setIsOtpSent(true);
     } catch (err) {
-      // Teesra Pop-up: Raste ka asli error yahan dikhega
+      // Teesra Pop-up
       alert("3. Raste mein error aaya: " + err.message); 
     } finally { 
       setLoading(false); 
@@ -40,14 +46,13 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const response = await axios.post('/api/verify-otp', { email, otp });
-            if (response.data.success) {
+      if (response.data.success) {
         localStorage.setItem('userLoggedIn', 'true');
-        // 👇 YAHI WO CHHOOTI HUI LINE HAI 👇
         localStorage.setItem('userEmail', email); 
         
         navigate('/feed');
         window.location.reload();
-            }
+      }
     } catch (err) {
       alert("Galat OTP! Fir se koshish karein.");
     } finally { setLoading(false); }
@@ -56,6 +61,7 @@ const LoginPage = () => {
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" bgcolor="background.default" color="text.primary">
       <Stack spacing={3} alignItems="center" sx={{ width: '90%', maxWidth: '400px', p: 4, borderRadius: '15px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+        {/* Favicon spelling check kiya tha, yahan sahi hai */}
         <img src="/favicon.ico" alt="logo" height={70} />
 
         {!isOtpSent ? (
