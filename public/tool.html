@@ -1,76 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ayush's Favicon Tool</title>
+    <title>BaseKey Image Compressor - No Login</title>
     <style>
-        body { font-family: sans-serif; background: #000; color: #fff; text-align: center; padding: 50px; }
-        .card { background: #111; padding: 30px; border-radius: 15px; border: 2px solid #2ea44f; display: inline-block; }
-        input, select, button { margin: 10px; padding: 10px; border-radius: 5px; border: none; }
-        button { background: #2ea44f; color: white; cursor: pointer; font-weight: bold; }
-        button:hover { background: #22863a; }
-        #preview { max-width: 150px; margin-top: 20px; display: none; border-radius: 10px; }
+        body { font-family: sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
+        .container { max-width: 500px; margin: auto; border: 2px dashed #FF1100; padding: 20px; border-radius: 15px; }
+        input { margin: 20px 0; }
+        button { background: #FF1100; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        canvas { display: none; }
+        #preview { max-width: 100%; margin-top: 20px; border-radius: 10px; display: none; }
+        .info { color: #aaa; font-size: 12px; margin-top: 10px; }
     </style>
 </head>
 <body>
-
-    <div class="card">
-        <h2>Ayush Video App Icon Tool</h2>
-        <p>Photo select karo, ye khud naam badal dega!</p>
+    <div class="container">
+        <h2>Ayush Banner Optimizer 🚀</h2>
+        <p>Apna bhari banner select karein (No Login Required)</p>
         
-        <input type="file" id="upload" accept="image/*"><br>
+        <input type="file" id="upload" accept="image/*">
+        <br>
+        <button onclick="compressImage()">Compress to WEBP</button>
         
-        <label>File ka naam: </label>
-        <select id="fileName">
-            <option value="favicon">favicon</option>
-            <option value="logo192">logo192</option>
-            <option value="logo512">logo512</option>
-        </select>
-        
-        <select id="fileExt">
-            <option value="png">.png (High Quality)</option>
-            <option value="ico">.ico (Standard)</option>
-        </select><br>
-
-        <button onclick="downloadImage()">Download Sahi Naam Se</button><br>
-        <img id="preview" alt="Preview">
+        <div class="info" id="status"></div>
+        <img id="preview" alt="Optimized Preview">
+        <br>
+        <a id="downloadBtn" style="display:none;"><button style="background: #28a745;">Download Halka Banner</button></a>
     </div>
 
+    <canvas id="canvas"></canvas>
+
     <script>
-        const upload = document.getElementById('upload');
-        const preview = document.getElementById('preview');
+        function compressImage() {
+            const file = document.getElementById('upload').files[0];
+            const reader = new FileReader();
+            const status = document.getElementById('status');
 
-        upload.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'inline-block';
+            if (!file) return alert("Bhai, pehle image toh chuno!");
+
+            status.innerHTML = "Processing... (Halka ho raha hai)";
+
+            reader.readAsDataURL(file);
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    // Standard Banner Size (Mobile Friendly)
+                    const maxWidth = 1200; 
+                    const scaleSize = maxWidth / img.width;
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scaleSize;
+
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Sabse tagra format: WEBP (Ye 6MB ko seedha 200KB bana dega)
+                    const dataUrl = canvas.toDataURL('image/webp', 0.7); // 70% Quality
+
+                    const preview = document.getElementById('preview');
+                    preview.src = dataUrl;
+                    preview.style.display = 'block';
+
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    downloadBtn.href = dataUrl;
+                    downloadBtn.download = "optimized-banner.webp";
+                    downloadBtn.style.display = 'inline-block';
+                    
+                    status.innerHTML = "Done! Original: " + (file.size / 1024).toFixed(2) + " KB | Optimized: WEBP Format";
                 }
-                reader.readAsDataURL(file);
             }
-        });
-
-        function downloadImage() {
-            const file = upload.files[0];
-            if (!file) {
-                alert("Pahle photo toh select kar lo bhai!");
-                return;
-            }
-
-            const name = document.getElementById('fileName').value;
-            const ext = document.getElementById('fileExt').value;
-            const link = document.createElement('a');
-            
-            link.href = preview.src;
-            link.download = `${name}.${ext}`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         }
     </script>
 </body>
 </html>
-
