@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { Typography, Box } from "@mui/material";
+// 🚀 Smart Imports
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 import { useParams } from "react-router-dom";
 
 import { fetchFromAPI } from "../utils/fetchFromAPI";
