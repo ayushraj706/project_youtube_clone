@@ -3,25 +3,26 @@ import { IconButton } from '@mui/material';
 import { NotificationsNone } from '@mui/icons-material';
 import { db } from '../firebase'; 
 import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
+import { useParams } from 'react-router-dom'; // Naya import URL ke liye
 
 const BellIcon = ({ channelDetail }) => {
+  const { id } = useParams(); // URL se ID nikalna (Master fallback)
+  const userEmail = localStorage.getItem('userEmail');
+
   const handleSubscribe = async () => {
-    // 1. Email check karein
-    const userEmail = localStorage.getItem('userEmail');
-    if (!userEmail) return alert("Bhai, pehle login toh kar lo! Email nahi mil raha.");
+    if (!userEmail) return alert("Bhai, pehle login toh kar lo!");
 
-    // 2. Channel ID nikalne ka pakka tarika (Har page ke liye)
-    // Channel Detail page par 'id' hota hai, Search page par 'id.channelId'
-    const channelId = channelDetail?.id?.channelId || channelDetail?.id;
+    // ID nikalne ka sabse pakka tarika:
+    // 1. Pehle channelDetail se dhoondho
+    // 2. Agar wahan nahi hai, toh seedha URL wali 'id' use karo
+    const channelId = channelDetail?.id?.channelId || channelDetail?.id || id;
 
-    // 3. Agar ID phir bhi nahi mili toh error dikhao (Query chalne se pehle)
     if (!channelId) {
-      console.log("Channel Data:", channelDetail);
-      return alert("Channel ID nahi mil rahi hai!");
+      console.log("Debug - Channel Data:", channelDetail);
+      return alert("Channel ID abhi bhi nahi mil rahi!");
     }
 
     try {
-      // 4. Ab query safe hai kyunki humne upar check kar liya hai
       const q = query(
         collection(db, "subscriptions"), 
         where("userEmail", "==", userEmail), 
@@ -29,14 +30,13 @@ const BellIcon = ({ channelDetail }) => {
       );
       
       const checkSub = await getDocs(q);
-      if (!checkSub.empty) return alert("Bhai, ye pehle se subscribe hai!");
+      if (!checkSub.empty) return alert("Ye channel pehle se subscribed hai!");
 
-      // 5. Data save karna
       await addDoc(collection(db, "subscriptions"), {
         userEmail: userEmail,
         channelId: channelId,
         channelName: channelDetail?.snippet?.title || "Unknown Channel",
-        channelAvatar: channelDetail?.snippet?.thumbnails?.high?.url || channelDetail?.snippet?.thumbnails?.default?.url || "",
+        channelAvatar: channelDetail?.snippet?.thumbnails?.high?.url || "",
         subscribedAt: new Date()
       });
 
