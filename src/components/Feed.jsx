@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Box, Stack, Typography } from "@mui/material";
-import InfiniteScroll from "react-infinite-scroll-component";
+// 🚀 Smart Imports for Performance
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 
+import InfiniteScroll from "react-infinite-scroll-component";
 import { fetchFromAPI } from "../utils/fetchFromAPI";
 import { Videos, Sidebar } from "./";
 import { useStore } from "../store/useStore"; 
@@ -58,7 +61,6 @@ const Feed = () => {
 
   return (
     <Stack sx={{ flexDirection: { xs: "column", md: "row" } }}>
-      {/* Sidebar - Desktop me ye apni jagah fasa rahega (sticky) */}
       <Box sx={{ 
         height: { xs: "auto", md: "92vh" }, 
         borderRight: "1px solid #3d3d3d", 
@@ -73,10 +75,6 @@ const Feed = () => {
         </Typography>
       </Box>
 
-      {/* SABSE BADA BADLAV: 
-        Yahan se 'height', 'overflowY' aur 'id' sab hata diya. 
-        Ab div automatically lamba hoga aur phone ki natural scrolling use hogi.
-      */}
       <Box p={2} sx={{ flex: 2 }}>
         <Typography variant="h4" fontWeight="bold" mb={2} sx={{ color: "white" }}>
           {selectedCategory === "New" && watchedCategories.length > 0 ? "Recommended" : selectedCategory} <span style={{ color: "#FC1503" }}>videos</span>
@@ -87,7 +85,6 @@ const Feed = () => {
           next={fetchMoreVideos}
           hasMore={!!nextPageToken} 
           loader={<Typography color="white" mt={2} textAlign="center">Loading more videos...</Typography>}
-          // YAHAN SE 'scrollableTarget' HATA DIYA. Ab ye phone ke main scroll ko track karega!
         >
           <Videos videos={videos} />
         </InfiniteScroll>
