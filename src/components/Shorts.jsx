@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, CircularProgress } from "@mui/material";
+// 🚀 Smart Imports for Performance
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+
 import ReactPlayer from "react-player";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Mousewheel } from "swiper/modules";
@@ -16,11 +20,9 @@ const Shorts = () => {
   const { watchedCategories } = useStore();
 
   useEffect(() => {
-    // Variety topics for a better mix
     const varietyTopics = ["facts", "study motivation", "science magic"];
     const randomVariety = varietyTopics[Math.floor(Math.random() * varietyTopics.length)];
 
-    // STRICT SHORTS FIX: Query ke aage '#shorts' lagana zaroori hai taaki lambe video kam aayein
     const query = watchedCategories.length > 0
       ? `${watchedCategories[0]} #shorts`
       : `${randomVariety} #shorts`;
@@ -53,25 +55,20 @@ const Shorts = () => {
         slidesPerView={1}
         mousewheel={true}
         modules={[Mousewheel]}
-        // Swiper batayega kaunsa video current screen par hai
         onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)} 
         style={{ height: "100%", width: "100%" }}
       >
         {shortsVideos.map((item, index) => {
-          
-          // AUDIO OVERLAP FIX: Sirf active slide ko true manenge
           const isActive = activeIndex === index;
 
           return (
             <SwiperSlide key={index}>
               <Box sx={{ height: "100%", width: "100%", position: "relative", backgroundColor: '#000' }}>
-                
-                {/* Agar video saamne hai tabhi Player chalega, warna sirf photo rahegi */}
                 {isActive ? (
                   <ReactPlayer
                     url={`https://www.youtube.com/watch?v=${item.id.videoId}`}
                     playing={true} 
-                    controls={true} // User ko pause karne ka option de diya
+                    controls={true} 
                     loop={true}
                     width="100%"
                     height="100%" 
@@ -81,7 +78,6 @@ const Shorts = () => {
                     }}
                   />
                 ) : (
-                  // Background ke videos ko bilkul band rakha gaya hai aawaz rokne ke liye
                   <img 
                     src={item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url} 
                     alt="thumbnail" 
@@ -89,7 +85,6 @@ const Shorts = () => {
                   />
                 )}
 
-                {/* Title and Channel Info */}
                 <Box sx={{ position: "absolute", bottom: "30px", left: "15px", zIndex: 10, width: "80%", pointerEvents: "none" }}>
                   <Typography variant="body1" fontWeight="bold" color="white" sx={{ textShadow: "2px 2px 4px black" }}>
                     {item.snippet.title.slice(0, 60)}...
@@ -98,7 +93,6 @@ const Shorts = () => {
                     {item.snippet.channelTitle}
                   </Typography>
                 </Box>
-
               </Box>
             </SwiperSlide>
           );
@@ -109,4 +103,5 @@ const Shorts = () => {
 };
 
 export default Shorts;
+
 
