@@ -40,11 +40,14 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const response = await axios.post('/api/verify-otp', { email, otp });
-      if (response.data.success) {
+            if (response.data.success) {
         localStorage.setItem('userLoggedIn', 'true');
+        // 👇 YAHI WO CHHOOTI HUI LINE HAI 👇
+        localStorage.setItem('userEmail', email); 
+        
         navigate('/feed');
         window.location.reload();
-      }
+            }
     } catch (err) {
       alert("Galat OTP! Fir se koshish karein.");
     } finally { setLoading(false); }
