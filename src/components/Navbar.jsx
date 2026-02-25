@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Stack, Box, Avatar, Menu, MenuItem, IconButton, Typography } from "@mui/material";
+// 🚀 Smart Imports for UI Components
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+
 import { Link, useNavigate } from "react-router-dom";
 import { logo } from "../utils/constants";
 import { SearchBar } from "./";
@@ -9,9 +17,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const open = Boolean(anchorEl);
 
-  // 1. LocalStorage se email uthana
   const userEmail = localStorage.getItem('userEmail') || "User";
-  const firstLetter = userEmail.charAt(0).toUpperCase(); // Pehla akshar bada karke
+  const firstLetter = userEmail.charAt(0).toUpperCase();
 
   const handleClick = (event) => { setAnchorEl(event.currentTarget); };
   const handleClose = () => { setAnchorEl(null); };
@@ -26,24 +33,13 @@ const Navbar = () => {
 
   return (
     <Stack direction="row" alignItems="center" p={2} sx={{ position: "sticky", background: '#000', top: 0, justifyContent: "space-between", zIndex: 10 }}>
-      
       <Box display="flex" alignItems="center">
         <Link to="/" style={{ display: "flex", alignItems: "center" }}>
           <img src={logo} alt="logo" height={45} />
         </Link>
 
-        {/* Dynamic Avatar: Pehla Letter automatic dikhega */}
         <IconButton onClick={handleClick} sx={{ ml: 1.5, p: 0 }}>
-          <Avatar 
-            sx={{ 
-              width: 38, 
-              height: 38, 
-              bgcolor: '#FF5722', // Mast rangin dabba
-              fontSize: '18px',
-              fontWeight: 'bold',
-              border: '2px solid #333'
-            }}
-          >
+          <Avatar sx={{ width: 38, height: 38, bgcolor: '#FF5722', fontSize: '18px', fontWeight: 'bold', border: '2px solid #333' }}>
             {firstLetter}
           </Avatar>
         </IconButton>
@@ -51,20 +47,12 @@ const Navbar = () => {
 
       <SearchBar />
 
-      {/* Logout Menu */}
       <Menu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         PaperProps={{
-          sx: {
-            bgcolor: '#111',
-            color: 'white',
-            mt: 1.5,
-            minWidth: '180px',
-            border: '1px solid #333',
-            '& .MuiMenuItem-root:hover': { bgcolor: '#222' }
-          }
+          sx: { bgcolor: '#111', color: 'white', mt: 1.5, minWidth: '180px', border: '1px solid #333', '& .MuiMenuItem-root:hover': { bgcolor: '#222' } }
         }}
       >
         <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid #222' }}>
@@ -73,8 +61,6 @@ const Navbar = () => {
             {userEmail}
           </Typography>
         </Box>
-        
-        {/* LAL RANG KA LOGOUT */}
         <MenuItem onClick={handleLogout} sx={{ color: '#FF1100', fontWeight: 'bold', py: 1.5 }}>
           LOGOUT
         </MenuItem>
