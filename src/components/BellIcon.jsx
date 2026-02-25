@@ -1,65 +1,45 @@
-import React, { useState } from 'react';
-import { IconButton, Tooltip, Typography, Stack } from '@mui/material';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
-// Dhyan rahe: firebase.js ka rasta sahi ho
+import React from 'react';
+import { IconButton } from '@mui/material';
+import { NotificationsNone, NotificationsActive } from '@mui/icons-material';
 import { db } from '../firebase'; 
+import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 
-const BellIcon = ({ channelId, channelTitle }) => {
-  const [subscribed, setSubscribed] = useState(false);
+const BellIcon = ({ channelDetail }) => {
+  const userEmail = localStorage.getItem('userEmail');
 
   const handleSubscribe = async () => {
-    // Check karo ki user login hai ya nahi
-    const userEmail = localStorage.getItem('userEmail');
-    if (!userEmail) return alert("Bhai, pehle login kar lo!");
+    if (!userEmail) return alert("Bhai, pehle login toh kar lo!");
 
     try {
-      // Firebase mein is student ke account mein ye channel jodd do
-      const userRef = doc(db, "users", userEmail);
-      await updateDoc(userRef, {
-        subscribedChannels: arrayUnion(channelId)
-      });
+      // 1. Pehle check karo ki ye channel pehle se subscribed hai ya nahi
+      const q = query(collection(db, "subscriptions"), 
+                where("userEmail", "==", userEmail), 
+                where("channelId", "==", channelDetail?.id?.channelId || channelDetail?.id));
       
-      setSubscribed(true);
-      alert(`🔔 Ghanti baj gayi! Ab ${channelTitle} ke naye video ka notification aayega.`);
-      
-      // Push Notification ke liye Permission maango (Browser pop-up)
-      requestNotificationPermission();
+      const checkSub = await getDocs(q);
+      if (!checkSub.empty) return alert("Ye channel pehle se subscribed hai!");
 
+      // 2. Naya logic: Name aur Avatar ke saath save karna
+      await addDoc(collection(db, "subscriptions"), {
+        userEmail: userEmail,
+        channelId: channelDetail?.id?.channelId || channelDetail?.id,
+        channelName: channelDetail?.snippet?.title || "Unknown Channel",
+        channelAvatar: channelDetail?.snippet?.thumbnails?.high?.url || "",
+        subscribedAt: new Date()
+      });
+
+      alert("🔔 Ghanti baj gayi! Ab ye aapki subscription list mein dikhega.");
     } catch (error) {
       console.error(error);
       alert("Database mein save nahi hua, Firebase Rules check karo.");
     }
   };
 
-  // Browser se notification bhejne ki ijazat mangna
-  const requestNotificationPermission = () => {
-    if ('Notification' in window) {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          console.log("Notification permission mil gayi!");
-          // Asli push notification ka token hum aage set karenge
-        }
-      });
-    }
-  };
-
   return (
-    <Stack direction="row" alignItems="center" spacing={1} 
-           sx={{ bgcolor: '#272727', px: 2, py: 0.5, borderRadius: '20px', cursor: 'pointer' }}
-           onClick={handleSubscribe}>
-      <Tooltip title={subscribed ? "Subscribed" : "Subscribe for Notifications"}>
-        <IconButton sx={{ color: subscribed ? '#FF1100' : 'white', p: 0.5 }}>
-          {subscribed ? <NotificationsActiveIcon /> : <NotificationsNoneIcon />}
-        </IconButton>
-      </Tooltip>
-      <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold' }}>
-        {subscribed ? "Subscribed" : "Subscribe"}
-      </Typography>
-    </Stack>
+    <IconButton onClick={handleSubscribe} sx={{ color: '#FF1100' }}>
+      <NotificationsNone />
+    </IconButton>
   );
 };
 
 export default BellIcon;
-
