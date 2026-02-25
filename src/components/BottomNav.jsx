@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
-import { Home, SlowMotionVideo, Subscriptions } from '@mui/icons-material'; // Subscriptions icon add kiya
+// 🚀 Smart Imports for Navigation
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import Paper from '@mui/material/Paper';
+
+// 🚀 Icons are heavy, import them individually
+import HomeIcon from '@mui/icons-material/Home';
+import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
+import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
+
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNav = () => {
@@ -8,7 +16,6 @@ const BottomNav = () => {
   const location = useLocation();
   const [value, setValue] = useState(0);
 
-  // URL ke hisaab se sahi button ko highligh (red) karne ke liye
   useEffect(() => {
     if (location.pathname === '/feed') setValue(0);
     else if (location.pathname === '/shorts') setValue(1);
@@ -24,29 +31,17 @@ const BottomNav = () => {
           setValue(newValue);
           if (newValue === 0) navigate('/feed');
           if (newValue === 1) navigate('/shorts');
-          if (newValue === 2) navigate('/subscriptions'); // Subscription par bhejne ke liye
+          if (newValue === 2) navigate('/subscriptions');
         }}
         sx={{ bgcolor: '#000', '& .Mui-selected': { color: '#FF1100 !important' } }}
       >
-        <BottomNavigationAction 
-          label="Home" 
-          icon={<Home />} 
-          sx={{ color: '#fff' }} 
-        />
-        <BottomNavigationAction 
-          label="Shorts" 
-          icon={<SlowMotionVideo />} 
-          sx={{ color: '#fff' }} 
-        />
-        {/* YAHAN NAYA BUTTON AA GAYA */}
-        <BottomNavigationAction 
-          label="Subscriptions" 
-          icon={<Subscriptions />} 
-          sx={{ color: '#fff' }} 
-        />
+        <BottomNavigationAction label="Home" icon={<HomeIcon />} sx={{ color: '#fff' }} />
+        <BottomNavigationAction label="Shorts" icon={<SlowMotionVideoIcon />} sx={{ color: '#fff' }} />
+        <BottomNavigationAction label="Subscriptions" icon={<SubscriptionsIcon />} sx={{ color: '#fff' }} />
       </BottomNavigation>
     </Paper>
   );
 };
 
 export default BottomNav;
+    
