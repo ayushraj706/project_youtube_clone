@@ -1,37 +1,48 @@
-import React from 'react';
-import { Paper, BottomNavigation, BottomNavigationAction } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo'; // Shorts ke liye icon
+import React, { useState, useEffect } from 'react';
+import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
+import { Home, SlowMotionVideo, Subscriptions } from '@mui/icons-material'; // Subscriptions icon add kiya
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [value, setValue] = useState(0);
 
-  // Agar user video dekh raha hai (full screen), toh patti chupalo
-  if (location.pathname.includes('/video/')) return null;
+  // URL ke hisaab se sahi button ko highligh (red) karne ke liye
+  useEffect(() => {
+    if (location.pathname === '/feed') setValue(0);
+    else if (location.pathname === '/shorts') setValue(1);
+    else if (location.pathname === '/subscriptions') setValue(2);
+  }, [location.pathname]);
 
   return (
     <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100 }} elevation={3}>
       <BottomNavigation
         showLabels
-        value={location.pathname === '/' ? '/feed' : location.pathname} // Home ko feed pe point karega
+        value={value}
         onChange={(event, newValue) => {
-          navigate(newValue);
+          setValue(newValue);
+          if (newValue === 0) navigate('/feed');
+          if (newValue === 1) navigate('/shorts');
+          if (newValue === 2) navigate('/subscriptions'); // Subscription par bhejne ke liye
         }}
-        sx={{ backgroundColor: '#000', borderTop: '1px solid #3d3d3d' }}
+        sx={{ bgcolor: '#000', '& .Mui-selected': { color: '#FF1100 !important' } }}
       >
         <BottomNavigationAction 
           label="Home" 
-          value="/feed" 
-          icon={<HomeIcon sx={{ color: location.pathname === '/feed' || location.pathname === '/' ? '#FC1503' : 'white' }} />} 
-          sx={{ color: 'gray', '&.Mui-selected': { color: '#FC1503' } }} 
+          icon={<Home />} 
+          sx={{ color: '#fff' }} 
         />
         <BottomNavigationAction 
           label="Shorts" 
-          value="/shorts" 
-          icon={<SlowMotionVideoIcon sx={{ color: location.pathname === '/shorts' ? '#FC1503' : 'white' }} />} 
-          sx={{ color: 'gray', '&.Mui-selected': { color: '#FC1503' } }} 
+          icon={<SlowMotionVideo />} 
+          sx={{ color: '#fff' }} 
+        />
+        {/* YAHAN NAYA BUTTON AA GAYA */}
+        <BottomNavigationAction 
+          label="Subscriptions" 
+          icon={<Subscriptions />} 
+          sx={{ color: '#fff' }} 
         />
       </BottomNavigation>
     </Paper>
@@ -39,4 +50,3 @@ const BottomNav = () => {
 };
 
 export default BottomNav;
-
