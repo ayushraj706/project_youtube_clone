@@ -1,54 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { IconButton } from '@mui/material';
-import { NotificationsNone } from '@mui/icons-material';
+import { NotificationsNone, NotificationsActive } from '@mui/icons-material';
 import { db } from '../firebase'; 
-import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
-import { useParams } from 'react-router-dom'; // Naya import URL ke liye
+import { collection, addDoc, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { useParams } from 'react-router-dom';
 
 const BellIcon = ({ channelDetail }) => {
-  const { id } = useParams(); // URL se ID nikalna (Master fallback)
+  const { id } = useParams();
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [docId, setDocId] = useState(null); // Unsubscribe karne ke liye ID
   const userEmail = localStorage.getItem('userEmail');
+  const channelId = channelDetail?.id?.channelId || channelDetail?.id || id;
 
-  const handleSubscribe = async () => {
+  // 1. Check status on mount: Kya user pehle se subscribed hai?
+  useEffect(() => {
+    const checkStatus = async () => {
+      if (!userEmail || !channelId) return;
+      const q = query(collection(db, "subscriptions"), 
+                where("userEmail", "==", userEmail), 
+                where("channelId", "==", channelId));
+      const snapshot = await getDocs(q);
+      if (!snapshot.empty) {
+        setIsSubscribed(true);
+        setDocId(snapshot.docs[0].id); // Document ID save karlo delete karne ke liye
+      } else {
+        setIsSubscribed(false);
+      }
+    };
+    checkStatus();
+  }, [userEmail, channelId]);
+
+  const handleToggleSubscribe = async () => {
     if (!userEmail) return alert("Bhai, pehle login toh kar lo!");
-
-    // ID nikalne ka sabse pakka tarika:
-    // 1. Pehle channelDetail se dhoondho
-    // 2. Agar wahan nahi hai, toh seedha URL wali 'id' use karo
-    const channelId = channelDetail?.id?.channelId || channelDetail?.id || id;
-
-    if (!channelId) {
-      console.log("Debug - Channel Data:", channelDetail);
-      return alert("Channel ID abhi bhi nahi mil rahi!");
-    }
+    if (!channelId) return alert("Channel ID nahi mil rahi!");
 
     try {
-      const q = query(
-        collection(db, "subscriptions"), 
-        where("userEmail", "==", userEmail), 
-        where("channelId", "==", channelId)
-      );
-      
-      const checkSub = await getDocs(q);
-      if (!checkSub.empty) return alert("Ye channel pehle se subscribed hai!");
-
-      await addDoc(collection(db, "subscriptions"), {
-        userEmail: userEmail,
-        channelId: channelId,
-        channelName: channelDetail?.snippet?.title || "Unknown Channel",
-        channelAvatar: channelDetail?.snippet?.thumbnails?.high?.url || "",
-        subscribedAt: new Date()
-      });
-
-      alert("🔔 Ghanti baj gayi! Ab list mein dikhega.");
+      if (isSubscribed) {
+        // UNSUBSCRIBE LOGIC
+        await deleteDoc(doc(db, "subscriptions", docId));
+        setIsSubscribed(false);
+        setDocId(null);
+        alert("Unsubscribed! 🔕");
+      } else {
+        // SUBSCRIBE LOGIC (With proper Name and Avatar)
+        const newSub = {
+          userEmail,
+          channelId,
+          channelName: channelDetail?.snippet?.title || "Unknown Channel",
+          channelAvatar: channelDetail?.snippet?.thumbnails?.high?.url || channelDetail?.snippet?.thumbnails?.default?.url || "",
+          subscribedAt: new Date()
+        };
+        const res = await addDoc(collection(db, "subscriptions"), newSub);
+        setDocId(res.id);
+        setIsSubscribed(true);
+        alert("Subscribed! 🔔");
+      }
     } catch (error) {
-      alert("Firebase Error: " + error.code);
+      alert("Error: " + error.message);
     }
   };
 
   return (
-    <IconButton onClick={handleSubscribe} sx={{ color: '#FF1100' }}>
-      <NotificationsNone />
+    <IconButton onClick={handleToggleSubscribe} sx={{ color: '#FF1100' }}>
+      {isSubscribed ? <NotificationsActive /> : <NotificationsNone />}
     </IconButton>
   );
 };
