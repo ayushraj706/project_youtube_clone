@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom"; 
 import ReactPlayer from "react-player";
-import { Typography, Box, Stack } from "@mui/material";
+// 🚀 Smart Imports
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { Videos, Loader } from "./";
@@ -17,7 +20,6 @@ const VideoDetail = () => {
   const { addWatchedCategory } = useStore(); 
 
   useEffect(() => {
-    // 1. Pehle Video ki detail mangwao
     fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
       .then((data) => {
         setVideoDetail(data.items[0]);
@@ -29,8 +31,6 @@ const VideoDetail = () => {
           addWatchedCategory(channelTitle); 
         }
 
-        // 2. BADA BADLAV: YouTube ne 'relatedToVideoId' block kar diya hai.
-        // Ab hum uske bajaye ussi channel ke latest videos fetch kar rahe hain.
         if(channelId) {
           fetchFromAPI(`search?part=snippet&channelId=${channelId}&type=video&maxResults=15`)
             .then((relatedData) => setVideos(relatedData.items));
@@ -67,11 +67,8 @@ const VideoDetail = () => {
   return (
     <Box minHeight="95vh">
       <Stack direction={{ xs: "column", md: "row" }}>
-        
-        {/* VIDEO PLAYER SECTION */}
         <Box flex={1}>
           <Box sx={{ width: "100%", position: "sticky", top: "86px" }}>
-            
             <Box sx={{ width: "100%", height: { xs: "30vh", sm: "45vh", md: "70vh" } }}>
               <ReactPlayer 
                 url={`https://www.youtube.com/watch?v=${id}`} 
@@ -106,16 +103,12 @@ const VideoDetail = () => {
           </Box>
         </Box>
 
-        {/* RELATED VIDEOS SECTION (Yahan ab channel ke videos aayenge) */}
         <Box px={2} py={{ md: 1, xs: 5 }} justifyContent="center" alignItems="center" >
-          {/* Agar videos abhi load nahi hue hain, toh Loader dikhega (Landing Page nahi!) */}
           {!videos ? <Loader /> : <Videos videos={videos} direction="column" />}
         </Box>
-
       </Stack>
     </Box>
   );
 };
 
 export default VideoDetail;
-
