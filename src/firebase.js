@@ -1,7 +1,8 @@
+// src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { getMessaging, getToken } from "firebase/messaging"; // NAYA IMPORT
+import { getMessaging, getToken } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCDmDsi_JMQgx_QO4p8bnvfh-vKdN4Bmk8",
@@ -16,18 +17,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
-export const messaging = getMessaging(app); // NAYA LINE
+
+// Messaging service chalu karna
+export const messaging = getMessaging(app);
 
 // Token nikalne ka special function
 export const requestForToken = async () => {
   try {
     const currentToken = await getToken(messaging, { 
-      // YAHAN APNI COPY KI HUI VAPID KEY DAALEIN
-      vapidKey: 'AAPKI_VAPID_KEY_YAHAN_PASTE_KAREIN' 
+      // YAHAN AAPKI CHABI (VAPID KEY) DAAL DI GAYI HAI 👇
+      vapidKey: 'BEIRO6rVTzbuVuTpaIFbVHsDQIZOlADkdcy2n3W-kfwScV_0HbslCNnnI_3qnAhRkayYEL6ent8Gmbf3GBwBeUs' 
     });
     
     if (currentToken) {
-      console.log('Push token mil gaya:', currentToken);
+      console.log('Push token (Digital Address) mil gaya:', currentToken);
       return currentToken;
     } else {
       console.log('Notification permission nahi mili hai.');
