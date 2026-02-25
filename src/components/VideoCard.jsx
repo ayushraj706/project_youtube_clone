@@ -1,21 +1,22 @@
 import React from 'react'
 import { Link } from "react-router-dom"; 
-import { Typography, Card, CardContent, CardMedia } from "@mui/material";
+// 🚀 Smart Imports for Performance
+import Typography from "@mui/material/Typography";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { demoThumbnailUrl, demoVideoUrl, demoVideoTitle, demoChannelUrl, demoChannelTitle } from "../utils/constants";
 
 const VideoCard = ({ video: { id, snippet } }) => {
-  // Logic: Check karo ye Video hai ya Playlist
   const videoId = id?.videoId;
-  const playlistId = id?.playlistId; // Playlist ID pakdo
+  const playlistId = id?.playlistId; 
 
-  // Link kahan jayega? (Video hai to /video/, Playlist hai to /playlist/)
   const linkUrl = videoId ? `/video/${videoId}` : playlistId ? `/playlist/${playlistId}` : demoVideoUrl;
 
   return (
     <Card sx={{ width: { xs: '100%', sm: '358px', md: "320px", }, boxShadow: "none", borderRadius: 0 }}>
-      {/* Thumbnail Click */}
       <Link to={linkUrl}>
         <CardMedia 
           image={snippet?.thumbnails?.high?.url || demoThumbnailUrl} 
@@ -25,14 +26,12 @@ const VideoCard = ({ video: { id, snippet } }) => {
       </Link>
       
       <CardContent sx={{ backgroundColor: "#1E1E1E", height: '106px' }}>
-        {/* Title Click */}
         <Link to={linkUrl} >
           <Typography variant="subtitle1" fontWeight="bold" color="#FFF">
             {snippet?.title.slice(0, 60) || demoVideoTitle.slice(0, 60)}
           </Typography>
         </Link>
         
-        {/* Channel Name */}
         <Link to={snippet?.channelId ? `/channel/${snippet?.channelId}` : demoChannelUrl} >
           <Typography variant="subtitle2" color="gray">
             {snippet?.channelTitle || demoChannelTitle}
