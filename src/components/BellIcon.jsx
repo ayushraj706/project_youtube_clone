@@ -4,15 +4,15 @@ import { NotificationsNone, NotificationsActive } from '@mui/icons-material';
 import { db } from '../firebase'; 
 import { collection, addDoc, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
+import { fetchFromAPI } from '../utils/fetchFromAPI'; // API mangwane ke liye
 
 const BellIcon = ({ channelDetail }) => {
   const { id } = useParams();
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [docId, setDocId] = useState(null); // Unsubscribe karne ke liye ID
+  const [docId, setDocId] = useState(null);
   const userEmail = localStorage.getItem('userEmail');
   const channelId = channelDetail?.id?.channelId || channelDetail?.id || id;
 
-  // 1. Check status on mount: Kya user pehle se subscribed hai?
   useEffect(() => {
     const checkStatus = async () => {
       if (!userEmail || !channelId) return;
@@ -22,9 +22,7 @@ const BellIcon = ({ channelDetail }) => {
       const snapshot = await getDocs(q);
       if (!snapshot.empty) {
         setIsSubscribed(true);
-        setDocId(snapshot.docs[0].id); // Document ID save karlo delete karne ke liye
-      } else {
-        setIsSubscribed(false);
+        setDocId(snapshot.docs[0].id);
       }
     };
     checkStatus();
@@ -36,20 +34,30 @@ const BellIcon = ({ channelDetail }) => {
 
     try {
       if (isSubscribed) {
-        // UNSUBSCRIBE LOGIC
         await deleteDoc(doc(db, "subscriptions", docId));
         setIsSubscribed(false);
         setDocId(null);
         alert("Unsubscribed! 🔕");
       } else {
-        // SUBSCRIBE LOGIC (With proper Name and Avatar)
+        let finalName = channelDetail?.snippet?.title;
+        let finalAvatar = channelDetail?.snippet?.thumbnails?.high?.url;
+
+        // PERMANENT EELAJ: Agar data gayab hai, toh API se turant mangwao
+        if (!finalName || !finalAvatar) {
+          console.log("Data missing, fetching from API...");
+          const data = await fetchFromAPI(`channels?part=snippet&id=${channelId}`);
+          finalName = data?.items[0]?.snippet?.title;
+          finalAvatar = data?.items[0]?.snippet?.thumbnails?.high?.url;
+        }
+
         const newSub = {
           userEmail,
           channelId,
-          channelName: channelDetail?.snippet?.title || "Unknown Channel",
-          channelAvatar: channelDetail?.snippet?.thumbnails?.high?.url || channelDetail?.snippet?.thumbnails?.default?.url || "",
+          channelName: finalName || "Unknown Channel",
+          channelAvatar: finalAvatar || "",
           subscribedAt: new Date()
         };
+
         const res = await addDoc(collection(db, "subscriptions"), newSub);
         setDocId(res.id);
         setIsSubscribed(true);
