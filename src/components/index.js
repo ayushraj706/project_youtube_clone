@@ -13,3 +13,5 @@ export { default as PlaylistDetail } from './PlaylistDetail';
 export { default as Shorts } from './Shorts';
 export { default as BottomNav } from './BottomNav';
 
+// Naya Subscription Page yahan add kiya
+export { default as SubscriptionPage } from './SubscriptionPage';
