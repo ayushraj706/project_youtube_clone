@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-// 🚀 Smart Imports
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Avatar from '@mui/material/Avatar';
-import CircularProgress from '@mui/material/CircularProgress';
-
+import { Box, Stack, Typography, Avatar, CircularProgress } from '@mui/material';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { db } from '../firebase'; 
@@ -19,10 +13,11 @@ const SubscriptionPage = () => {
   const [channels, setChannels] = useState([]);
   const [videos, setVideos] = useState([]);
   const [selectedChannel, setSelectedChannel] = useState(null);
-  const [nextPageToken, setNextPageToken] = useState(null); 
+  const [nextPageToken, setNextPageToken] = useState(null); // Agli videos ke liye token
   const userEmail = localStorage.getItem('userEmail');
   const scrollRef = useRef(null);
 
+  // 1. Subscribed Channels mangwana
   useEffect(() => {
     const fetchSubs = async () => {
       if (!userEmail) return setLoading(false);
@@ -39,34 +34,37 @@ const SubscriptionPage = () => {
     fetchSubs();
   }, [userEmail]);
 
+  // 2. Channel ki pehli 50 videos mangwana
   const handleChannelClick = (channelId) => {
     setLoading(true);
-    setVideos([]); 
+    setVideos([]); // Purani videos saaf karo
     setSelectedChannel(channelId);
     
     fetchFromAPI(`search?channelId=${channelId}&part=snippet&order=date&maxResults=50`)
       .then((data) => {
         setVideos(data.items);
-        setNextPageToken(data.nextPageToken); 
+        setNextPageToken(data.nextPageToken); // Agli baar ke liye chabi save karo
         setLoading(false);
       });
   };
 
+  // 3. Aur videos mangwana (Load More Logic)
   const fetchMoreVideos = () => {
     if (!nextPageToken || fetchingMore) return;
 
     setFetchingMore(true);
     fetchFromAPI(`search?channelId=${selectedChannel}&part=snippet&order=date&maxResults=50&pageToken=${nextPageToken}`)
       .then((data) => {
-        setVideos((prevVideos) => [...prevVideos, ...data.items]); 
+        setVideos((prevVideos) => [...prevVideos, ...data.items]); // Purani + Nayi videos jod do
         setNextPageToken(data.nextPageToken);
         setFetchingMore(false);
       });
   };
 
+  // 4. Scroll Detection: Jab user bottom par pahunche
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    if (scrollHeight - scrollTop <= clientHeight + 100) { 
+    if (scrollHeight - scrollTop <= clientHeight + 100) { // 100px pehle hi trigger kar do
       fetchMoreVideos();
     }
   };
