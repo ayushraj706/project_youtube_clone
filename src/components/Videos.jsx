@@ -1,5 +1,7 @@
 import React from "react";
-import { Stack, Box } from "@mui/material";
+// 🚀 Smart Imports
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 
 import { ChannelCard, Loader, VideoCard } from "./";
 
