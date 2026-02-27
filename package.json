@@ -22,8 +22,6 @@
     "zustand": "^4.5.0",
     "lucide-react": "latest",
     "tailwind-merge": "latest",
-    "clsx": "latest",
-    "shadcn-chat": "latest"
+    "clsx": "latest"
   }
 }
-
