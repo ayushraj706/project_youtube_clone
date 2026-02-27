@@ -6,14 +6,14 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 
-// Yahan se Video Data aa raha hai (Jo aapne videoData.js banaya tha)
+// Yahan se Video Data aa raha hai
 import { educationalVideos } from '../utils/videoData';
 
 const LandingPage = () => {
   return (
     <Box sx={{ backgroundColor: '#000', color: '#fff', minHeight: '100vh' }}>
       
-      {/* ---------------- 1. HERO SECTION (Upar wala hissa) ---------------- */}
+      {/* ---------------- 1. HERO SECTION ---------------- */}
       <Box 
         sx={{
           height: '90vh',
@@ -26,17 +26,17 @@ const LandingPage = () => {
           padding: '20px'
         }}
       >
+        {/* BRANDING: BaseKey add kiya gaya hai */}
         <Typography variant="h2" fontWeight="900" sx={{ color: '#FC1503', textTransform: 'uppercase', letterSpacing: '2px', mb: 2 }}>
-          Ayush Video App
+          BaseKey <span style={{ color: '#fff', fontSize: '1.5rem', verticalAlign: 'middle' }}>(By Ayush Raj)</span>
         </Typography>
         <Typography variant="h4" fontWeight="bold" sx={{ mb: 3, maxWidth: '800px' }}>
           India's #1 Free Learning Platform for <span style={{ color: '#FC1503' }}>Class 10th</span> Students
         </Typography>
         <Typography variant="body1" sx={{ color: 'gray', mb: 5, maxWidth: '600px', fontSize: '1.2rem' }}>
-          Crack your Bihar Board (BSEB) & CBSE Matric Exams 2026 with our premium video lectures, PDF notes, and model papers. 100% Free. No Hidden Costs.
+          Crack your Bihar Board (BSEB) & CBSE Matric Exams 2026 with BaseKey's premium video lectures, PDF notes, and model papers. 100% Free.
         </Typography>
 
-        {/* LOGIC CHANGE: Yahan /feed ko badal kar /login kar diya hai */}
         <Link to="/login" style={{ textDecoration: 'none' }}>
           <Button 
             variant="contained" 
@@ -55,20 +55,20 @@ const LandingPage = () => {
         </Link>
       </Box>
 
-      {/* ---------------- 2. CONTENT SECTION (AdSense Text) ---------------- */}
+      {/* ---------------- 2. CONTENT SECTION ---------------- */}
       <Container maxWidth="lg" sx={{ paddingBottom: '100px' }}>
         
-        {/* Why Choose Us */}
+        {/* Why Choose Us / Our Mission */}
         <Box sx={{ mb: 8 }}>
           <Typography variant="h3" fontWeight="bold" gutterBottom sx={{ borderLeft: '5px solid #FC1503', pl: 2 }}>
             Our Mission
           </Typography>
           <Typography variant="body1" sx={{ color: '#ccc', lineHeight: 1.8, fontSize: '1.1rem', mb: 3 }}>
-            Welcome to <b>Ayush Video App</b>. We provide the best educational videos from top educators and organize them subject-wise. Whether you are preparing for your <b>Matriculation Board Exams 2026</b> or just want to clear your concepts in Science and Maths, Ayush Video App is your one-stop solution.
+            Welcome to <b>BaseKey</b> (A specialized unit of <b>SUPERKEY</b>). We provide the best educational videos from top educators and organize them subject-wise. Whether you are preparing for your <b>Matriculation Board Exams 2026</b> or just want to clear your concepts, BaseKey is your one-stop solution.
           </Typography>
         </Box>
 
-        {/* ---------------- 3. VIDEO RECOMMENDATION (Yahan aayengi Videos) ---------------- */}
+        {/* ---------------- 3. VIDEO RECOMMENDATION ---------------- */}
         <Box sx={{ mb: 8 }}>
           <Typography variant="h3" fontWeight="bold" gutterBottom sx={{ borderLeft: '5px solid #FC1503', pl: 2, mb: 4 }}>
             Popular Lectures (Must Watch)
@@ -120,14 +120,24 @@ const LandingPage = () => {
           ))}
         </Grid>
 
-        {/* Footer */}
-        <Box sx={{ borderTop: '1px solid #333', pt: 4, textAlign: 'center' }}>
-          <Typography variant="body2" color="gray">
-            Copyright © 2026 Ayush Raj. All Rights Reserved.
+        {/* ---------------- 4. LEGAL FOOTER (Verification ke liye zaroori) ---------------- */}
+        <Box sx={{ borderTop: '1px solid #333', pt: 6, pb: 4, textAlign: 'center' }}>
+          <Typography variant="h6" fontWeight="bold" color="#FC1503" sx={{ mb: 1 }}>
+            BaseKey
           </Typography>
-          <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 2 }}>
-            <Typography variant="caption" color="gray" sx={{ cursor: 'pointer' }}>Privacy Policy</Typography>
-            <Typography variant="caption" color="gray" sx={{ cursor: 'pointer' }}>Terms of Service</Typography>
+          <Typography variant="body2" color="gray" sx={{ mb: 1 }}>
+            [span_0](start_span)A Unit of <b>SUPERKEY</b> (Registered Micro Enterprise)[span_0](end_span)
+          </Typography>
+          <Typography variant="caption" display="block" color="gray" sx={{ maxWidth: '500px', margin: '0 auto', mb: 2 }}>
+            [span_1](start_span)Address: Wordno 2, Near Panchayat Bhawan, Khadiyahi, Bibhutipur, Samastipur, Bihar - 848211[span_1](end_span)
+          </Typography>
+          <Typography variant="body2" color="gray">
+            Copyright © 2026 <b>SUPERKEY</b>. All Rights Reserved.
+          </Typography>
+          <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 3 }}>
+            <Typography variant="caption" color="gray" sx={{ cursor: 'pointer', '&:hover': { color: '#FC1503' } }}>Privacy Policy</Typography>
+            <Typography variant="caption" color="gray" sx={{ cursor: 'pointer', '&:hover': { color: '#FC1503' } }}>Terms of Service</Typography>
+            [span_2](start_span)<Typography variant="caption" color="gray">Contact: +91 9771393274</Typography>[span_2](end_span)
           </Stack>
         </Box>
 
